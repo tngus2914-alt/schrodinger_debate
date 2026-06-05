@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슈뢰딩거의 고양이: 양자역학 해석 탐구 시뮬레이션</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: #080c14;
+            --bg-surface: #0f172a;
+            --bg-surface-elevated: #1e293b;
+            --primary: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.4);
+            --schrodinger: #ff5757;
+            --schrodinger-glow: rgba(255, 87, 87, 0.3);
+            --bohr: #00e5ff;
+            --bohr-glow: rgba(0, 229, 255, 0.3);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 240, 255, 0.15);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Pretendard', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(8, 12, 20, 0) 100%);
+            backdrop-filter: blur(8px);
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00f0ff 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .header-title p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+
+        /* --- Main Layout --- */
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* --- Left Column: Sim & Progress --- */
+        .simulation-column {
+            flex: 1.1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.3);
+            padding: 24px;
+            overflow-y: auto;
+            align-items: center;
+        }
+
+        /* Stepper UI */
+        .stepper {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: #1e293b;
+            z-index: 1;
+        }
+
+        .stepper-progress {
+            position: absolute;
+            top: 15px;
+            left: 5%;
+            width: 0%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step-node {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+
+        .step-node.active .step-circle {
+            background: var(--bg-base);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .step-node.completed .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #020617;
+        }
+
+        .step-text {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .step-node.active .step-text {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* 3D-Like Quantum Box Card */
+        .box-card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .box-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .box-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(9, 13, 22, 0.8) 100%);
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: var(--transition);
+        }
+
+        .box-container.superposition-active {
+            border-color: var(--primary);
+            box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.15), 0 0 25px rgba(0, 240, 255, 0.2);
+        }
+
+        .box-interior {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Interactive Items inside box */
+        .sim-item {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            padding: 8px;
+        }
+
+        .sim-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .sim-item svg {
+            width: 70px;
+            height: 70px;
+            transition: var(--transition);
+        }
+
+        .sim-item span.label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        /* SVG Animations */
+        .atom-nucleus {
+            animation: pulse-core 2s infinite alternate;
+        }
+        @keyframes pulse-core {
+            0% { fill: #f59e0b; r: 8px; }
+            100% { fill: #ef4444; r: 10px; }
+        }
+
+        .electron {
+            animation: orbit 3s linear infinite;
+            transform-origin: 50px 50px;
+        }
+        .electron.e1 { animation-duration: 2.5s; }
+        .electron.e2 { animation-duration: 4s; }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .poison-liquid {
+            animation: bubble-liquid 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes bubble-liquid {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(1px); }
+        }
+
+        .cat-tail {
+            transform-origin: 70px 70px;
+            animation: tail-wag 2s infinite alternate ease-in-out;
+        }
+        @keyframes tail-wag {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(15deg); }
+        }
+
+        /* Box Connection Wires */
+        .conn-wire {
+            position: absolute;
+            background: rgba(148, 163, 184, 0.2);
+            z-index: 1;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        .conn-wire.w1 {
+            top: 25%; left: 75%; width: 2px; height: 50%;
+        }
+        .conn-wire.w2 {
+            top: 75%; left: 25%; width: 50%; height: 2px;
+        }
+        .conn-wire.active {
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        /* Box Lid Overlay */
+        .box-lid {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #475569;
+            border-radius: 16px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-100%);
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .box-lid.closed {
+            transform: translateY(0);
+        }
+
+        .box-lid.opaque {
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            border-color: var(--primary);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35), inset 0 0 40px rgba(0, 240, 255, 0.15);
+            animation: container-glow 3s infinite alternate;
+        }
+
+        @keyframes container-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.1), inset 0 0 20px rgba(0, 240, 255, 0.05); }
+            100% { box-shadow: 0 0 25px rgba(0, 240, 255, 0.35), inset 0 0 40px rgba(0, 240, 255, 0.15); }
+        }
+
+        .box-lid-pattern {
+            width: 140px;
+            height: 140px;
+            opacity: 0.15;
+            margin-bottom: 20px;
+            background-image: radial-gradient(circle, var(--primary) 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+        }
+
+        .lid-status {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lid-status .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            box-shadow: 0 0 6px rgba(255,255,255,0.2);
+            transition: var(--transition);
+        }
+
+        .box-lid.opaque .lid-status .status-dot {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse-cyan 1s infinite alternate;
+        }
+
+        @keyframes pulse-cyan {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Result Overlay */
+        .result-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .result-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .result-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: scale(0.9);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-overlay.active .result-box {
+            transform: scale(1);
+        }
+
+        .result-icon {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 2px solid;
+            box-shadow: 0 0 30px;
+        }
+
+        .result-icon.alive {
+            border-color: var(--success);
+            color: var(--success);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
+        }
+
+        .result-icon.dead {
+            border-color: #64748b;
+            color: #94a3b8;
+            box-shadow: 0 0 30px rgba(148, 163, 184, 0.2);
+        }
+
+        .result-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .result-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            max-width: 280px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Tooltip style */
+        .tooltip-card {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 12px 16px;
+            width: 240px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 30;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: var(--transition);
+        }
+
+        .tooltip-card.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .tooltip-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .tooltip-content {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        /* Instruction text below box */
+        .box-info-footer {
+            margin-top: 18px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        /* Reset control */
+        .side-controls {
+            margin-top: 25px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+
+        /* --- Right Column: Dynamic Steps Interaction Panel --- */
+        .interaction-column {
+            flex: 1.2;
+            background: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .interaction-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            margin-bottom: 24px;
+        }
+
+        .panel-step-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Step 1 Content */
+        .step-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .step-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .desc-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .desc-card p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .desc-card p strong {
+            color: var(--text-main);
+        }
+
+        .instruction-box {
+            background: rgba(0, 240, 255, 0.03);
+            border-left: 3px solid var(--primary);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        /* Choice Cards in Step 2 & 3 */
+        .choices-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .choice-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .choice-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateX(4px);
+        }
+
+        .choice-card.selected {
+            background: rgba(0, 240, 255, 0.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--border-glow);
+        }
+
+        .choice-card.locked {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .choice-card.selected.locked {
+            opacity: 1;
+        }
+
+        .choice-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+
+        .choice-card.selected .choice-badge {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #020617;
+        }
+
+        .choice-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* Scientist Speech Peek */
+        .peek-container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 25px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s ease;
+        }
+
+        .peek-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .peek-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .scientist-peek-bubble {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .avatar-small {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            border: 1px solid;
+        }
+
+        .avatar-small.sch {
+            border-color: var(--schrodinger);
+            background-color: rgba(255, 87, 87, 0.1);
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Erwin_Schrodinger%2C_c._1933.jpg/220px-Erwin_Schrodinger%2C_c._1933.jpg');
+        }
+
+        .avatar-small.bohr {
+            border-color: var(--bohr);
+            background-color: rgba(0, 229, 255, 0.1);
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Niels_Bohr.jpg/220px-Niels_Bohr.jpg');
+        }
+
+        .peek-speech {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 0 12px 12px 12px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .scientist-peek-bubble.sch .peek-speech {
+            border-left: 3px solid var(--schrodinger);
+        }
+
+        .scientist-peek-bubble.bohr .peek-speech {
+            border-left: 3px solid var(--bohr);
+        }
+
+        .peek-name {
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .peek-name span.role {
+            font-weight: normal;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+        }
+
+        /* Action Buttons */
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #020617;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+            background: #00e0ef;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .actions-bar {
+            margin-top: 30px;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* --- Chatroom (Step 4) UI --- */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            flex: 1;
+            background: rgba(2, 6, 23, 0.4);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-title-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .chat-badge {
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* 2열 메인 영역 */
+        .chat-main-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background: rgba(2, 6, 23, 0.2);
+        }
+
+        /* 과학자 프로필 사이드바 */
+        .debate-scientists-sidebar {
+            width: 260px;
+            border-right: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .scientist-profile-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .scientist-profile-card.active-speaker {
+            border-color: var(--primary);
+            background: rgba(0, 240, 255, 0.03);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .sci-photo {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            border: 1.5px solid;
+            flex-shrink: 0;
+        }
+
+        .sci-photo.sch {
+            border-color: var(--schrodinger);
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Erwin_Schrodinger%2C_c._1933.jpg/220px-Erwin_Schrodinger%2C_c._1933.jpg');
+        }
+
+        .sci-photo.bohr {
+            border-color: var(--bohr);
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Niels_Bohr.jpg/220px-Niels_Bohr.jpg');
+        }
+
+        .sci-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sci-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sci-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sci-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .sci-indicator.sch.speaking {
+            background: var(--schrodinger);
+            box-shadow: 0 0 8px var(--schrodinger);
+            animation: pulse-indicator-sch 1s infinite alternate;
+        }
+
+        .sci-indicator.bohr.speaking {
+            background: var(--bohr);
+            box-shadow: 0 0 8px var(--bohr);
+            animation: pulse-indicator-bohr 1s infinite alternate;
+        }
+
+        @keyframes pulse-indicator-sch {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        @keyframes pulse-indicator-bohr {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .sci-title {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .sci-years {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* 메시지 윈도우 영역 */
+        .chat-messages-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .msg-group {
+            display: flex;
+            gap: 15px;
+            max-width: 85%;
+        }
+
+        .msg-group.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .msg-group.sch {
+            align-self: flex-start;
+        }
+
+        .msg-group.bohr {
+            align-self: flex-start;
+        }
+
+        .avatar-chat {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid;
+            flex-shrink: 0;
+            display: none; /* 사이드바가 있으므로 버블 옆 아바타는 숨김 */
+        }
+
+        .msg-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .msg-info {
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--text-dim);
+            display: flex;
+            gap: 6px;
+        }
+
+        .msg-group.user .msg-info {
+            align-self: flex-end;
+        }
+
+        .msg-info .role {
+            font-weight: normal;
+            color: var(--text-muted);
+        }
+
+        .msg-bubble {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            position: relative;
+        }
+
+        .msg-group.user .msg-bubble {
+            background: rgba(0, 240, 255, 0.04);
+            border-color: rgba(0, 240, 255, 0.2);
+            border-top-right-radius: 4px;
+        }
+
+        .msg-group.sch .msg-bubble {
+            background: rgba(255, 87, 87, 0.05);
+            border-color: rgba(255, 87, 87, 0.2);
+            border-top-left-radius: 4px;
+            border-left: 3px solid var(--schrodinger);
+        }
+
+        .msg-group.bohr .msg-bubble {
+            background: rgba(0, 229, 255, 0.05);
+            border-color: rgba(0, 229, 255, 0.2);
+            border-top-left-radius: 4px;
+            border-left: 3px solid var(--bohr);
+        }
+
+        .chat-input-panel {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            background: #090d16;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            outline: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0,240,255,0.15);
+        }
+
+        .typing-indicator {
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.3);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* --- Summary Dashboard UI --- */
+        .summary-dashboard {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .summary-title-main {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(90deg, var(--primary) 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .summary-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .summary-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .summary-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flow-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .flow-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .flow-val {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.015);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .opinion-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opinion-sc-item {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid;
+        }
+
+        .opinion-sc-item.sch {
+            border-left-color: var(--schrodinger);
+        }
+
+        .opinion-sc-item.bohr {
+            border-left-color: var(--bohr);
+        }
+
+        .opinion-sc-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .opinion-sc-text {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .reflection-card {
+            grid-column: 1 / -1;
+            background: rgba(0, 240, 255, 0.02);
+            border-color: rgba(0, 240, 255, 0.15);
+        }
+
+        .reflection-list {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reflection-list li {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .reflection-list li strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">
+        <h1>슈뢰딩거의 고양이: 양자역학 해석 탐구</h1>
+        <p>양자 중첩과 관측 문제를 시뮬레이션하고, 거장들의 논쟁 속에서 물리적 실재를 고찰해보세요.</p>
+    </div>
+    <div class="header-model">
+        <span class="chat-badge" id="model-tag">Gemini API Connected</span>
+    </div>
+</header>
+
+<main>
+    <!-- Left Column: Simulation Display -->
+    <section class="simulation-column">
+        <!-- Step Stepper -->
+        <div class="stepper">
+            <div class="stepper-progress" id="step-progress"></div>
+            <div class="step-node" id="step-node-1" onclick="jumpToStep(1)">
+                <div class="step-circle">1</div>
+                <div class="step-text">실험 이해</div>
+            </div>
+            <div class="step-node" id="step-node-2">
+                <div class="step-circle">2</div>
+                <div class="step-text">상태 예측</div>
+            </div>
+            <div class="step-node" id="step-node-3">
+                <div class="step-circle">3</div>
+                <div class="step-text">상자 관측</div>
+            </div>
+            <div class="step-node" id="step-node-4">
+                <div class="step-circle">4</div>
+                <div class="step-text">학자 토론</div>
+            </div>
+        </div>
+
+        <!-- Quantum Box Display -->
+        <div class="box-card">
+            <div class="box-title">
+                <span>📦 QUANTUM EXPERIMENT CHAMBER</span>
+            </div>
+            <div class="box-container" id="box-chamber">
+                <!-- Inner items -->
+                <div class="box-interior">
+                    <!-- Connections -->
+                    <div class="conn-wire w1" id="wire-detector-poison"></div>
+                    <div class="conn-wire w2" id="wire-poison-cat"></div>
+
+                    <!-- 1. Radioactive Atom -->
+                    <div class="sim-item" id="item-atom" onclick="showTooltip('atom', event)">
+                        <svg viewBox="0 0 100 100">
+                            <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(30 50 50)"/>
+                            <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(150 50 50)"/>
+                            <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(90 50 50)"/>
+                            <circle cx="50" cy="50" r="8" fill="#f59e0b" class="atom-nucleus"/>
+                            <!-- Electrons -->
+                            <g class="electron e1">
+                                <circle cx="15" cy="50" r="3.5" fill="#00f0ff" filter="drop-shadow(0 0 3px var(--primary))"/>
+                            </g>
+                            <g class="electron e2">
+                                <circle cx="50" cy="15" r="3.5" fill="#ff5757" filter="drop-shadow(0 0 3px var(--schrodinger))"/>
+                            </g>
+                        </svg>
+                        <span class="label">방사성 원자</span>
+                    </div>
+
+                    <!-- 2. Geiger Detector -->
+                    <div class="sim-item" id="item-detector" onclick="showTooltip('detector', event)">
+                        <svg viewBox="0 0 100 100">
+                            <rect x="15" y="20" width="70" height="60" rx="8" fill="#2d3748" stroke="#4a5568" stroke-width="2.5"/>
+                            <rect x="25" y="28" width="50" height="24" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+                            <path d="M30,46 A 20,20 0 0,1 70,46" fill="none" stroke="#475569" stroke-width="2.5"/>
+                            <line x1="50" y1="48" x2="38" y2="34" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" id="detector-needle"/>
+                            <circle cx="50" cy="68" r="4.5" fill="#64748b" id="detector-led"/>
+                        </svg>
+                        <span class="label">가이거 검출기</span>
+                    </div>
+
+                    <!-- 3. Poison Vial -->
+                    <div class="sim-item" id="item-poison" onclick="showTooltip('poison', event)">
+                        <svg viewBox="0 0 100 100">
+                            <!-- Hammer -->
+                            <g id="vial-hammer" style="transform-origin: 30px 25px; transition: transform 0.5s ease;">
+                                <rect x="25" y="15" width="16" height="10" rx="1" fill="#71717a"/>
+                                <rect x="31" y="24" width="4" height="20" fill="#71717a"/>
+                            </g>
+                            <!-- Vial -->
+                            <path d="M44,42 L44,48 L32,74 A 4,4 0 0,0 36,80 L64,80 A 4,4 0 0,0 68,74 L56,48 L56,42 Z" fill="none" stroke="#a1a1aa" stroke-width="2.5" id="vial-glass"/>
+                            <rect x="46" y="36" width="8" height="6" rx="1" fill="#b45309"/>
+                            <path d="M34,68 Q50,71 66,68 L64,76 A 2,2 0 0,1 62,78 L38,78 A 2,2 0 0,1 36,76 Z" fill="#22c55e" opacity="0.85" id="vial-liquid"/>
+                        </svg>
+                        <span class="label">독극물 장치</span>
+                    </div>
+
+                    <!-- 4. Cat -->
+                    <div class="sim-item" id="item-cat" onclick="showTooltip('cat', event)">
+                        <!-- Cat SVG -->
+                        <svg viewBox="0 0 100 100">
+                            <g id="cat-visual">
+                                <path d="M30,72 Q50,88 70,72 Q75,58 70,44 Q50,49 30,44 Q25,58 30,72 Z" fill="#e2e8f0" class="cat-body"/>
+                                <circle cx="50" cy="42" r="17" fill="#e2e8f0" class="cat-head"/>
+                                <polygon points="36,30 31,12 47,26" fill="#e2e8f0"/>
+                                <polygon points="64,30 69,12 53,26" fill="#e2e8f0"/>
+                                <polygon points="38,27 36,16 45,24" fill="#fda4af"/>
+                                <polygon points="62,27 64,16 55,24" fill="#fda4af"/>
+                                <g id="cat-eyes">
+                                    <circle cx="43" cy="40" r="2.5" fill="#0f172a" id="cat-eye-l"/>
+                                    <circle cx="57" cy="40" r="2.5" fill="#0f172a" id="cat-eye-r"/>
+                                </g>
+                                <polygon points="50,44 48,42 52,42" fill="#fda4af"/>
+                                <path d="M47,46 Q50,48 50,46 Q50,48 53,46" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+                                <path d="M70,72 Q86,76 82,58" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" fill="none" class="cat-tail"/>
+                            </g>
+                            <g id="cat-halo" style="display: none;">
+                                <ellipse cx="50" cy="20" rx="14" ry="4" fill="none" stroke="#ffd700" stroke-width="2" filter="drop-shadow(0 0 4px #ffd700)"/>
+                            </g>
+                        </svg>
+                        <span class="label" id="cat-label">고양이</span>
+                    </div>
+                </div>
+
+                <!-- Box Lid (Sealer) -->
+                <div class="box-lid" id="box-lid">
+                    <div class="box-lid-pattern"></div>
+                    <div class="lid-status" id="lid-status-container">
+                        <span class="status-dot"></span>
+                        <span id="lid-status-text">상자 열림</span>
+                    </div>
+                </div>
+
+                <!-- Result screen overlay -->
+                <div class="result-overlay" id="box-result-overlay">
+                    <div class="result-box">
+                        <div class="result-icon" id="box-result-icon">
+                            😺
+                        </div>
+                        <h2 class="result-title" id="box-result-title">생존 확인</h2>
+                        <p class="result-desc" id="box-result-desc">관측이 수행되는 즉시 중첩 상태가 붕괴하여 단 하나의 실제적 생존 상태가 나타났습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-info-footer" id="sim-status-desc">
+                각 실험 장치를 클릭하여 그 역할을 살펴보세요.
+            </div>
+
+            <div class="side-controls">
+                <button class="btn btn-secondary" id="btn-reset" onclick="resetSim()" style="display: none;">
+                    🔄 처음부터 다시 시작
+                </button>
+            </div>
+        </div>
+
+        <!-- Tooltip Card component inside simulation side -->
+        <div class="tooltip-card" id="tooltip">
+            <div class="tooltip-title" id="tooltip-title">원자</div>
+            <div class="tooltip-content" id="tooltip-content">방사성 원자</div>
+        </div>
+    </section>
+
+    <!-- Right Column: Interactive Panel -->
+    <section class="interaction-column">
+        <div class="interaction-panel" id="panel-content-area">
+            
+            <!-- STEP 1: UNDERSTANDING -->
+            <div class="step-content active" id="content-step-1">
+                <div class="panel-header">
+                    <div class="panel-step-label">1단계: 사고실험 이해</div>
+                    <h2 class="panel-title">양자 밀폐 상자 관찰</h2>
+                </div>
+                
+                <div class="desc-card">
+                    <p>오스트리아의 물리학자 <strong>에르빈 슈뢰딩거</strong>는 거시 세계의 직관과 미시 양자 세계의 규칙이 어떻게 충돌할 수 있는지 보여주기 위해 하나의 상상 실험을 제안했습니다.</p>
+                    <p>상자 속에는 <strong>방사성 원자, 가이거 검출기, 독극물 장치, 그리고 고양이</strong>가 들어있습니다.</p>
+                    <p>원자가 붕괴하면 검출기가 이를 감지하여 독극물 병을 깨뜨리고 고양이는 사망하게 됩니다. 만약 붕괴하지 않는다면 고양이는 계속 살아갑니다.</p>
+                    
+                    <div class="instruction-box">
+                        좌측 시뮬레이터 속의 원자, 검출기, 독극물, 고양이를 각각 마우스로 클릭하여 설명을 확인해보세요. 확인이 완료되면 아래 버튼을 눌러 실험을 개시합니다.
+                    </div>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-primary" id="btn-start-experiment" onclick="startExperiment()">
+                        ⚡ 실험 시작 (상자 닫기)
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: PREDICTION -->
+            <div class="step-content" id="content-step-2">
+                <div class="panel-header">
+                    <div class="panel-step-label">2단계: 예측하기</div>
+                    <h2 class="panel-title">상자 속 고양이 상태 예측</h2>
+                </div>
+
+                <div class="desc-card">
+                    <p style="color: var(--primary); font-weight: 600; font-size: 0.95rem; border-left: 2px solid var(--primary); padding-left: 10px;">
+                        상자가 완전히 닫히고 불투명하게 변했습니다. 우리는 상자 안을 직접 들여다볼 수 없습니다.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        이 순간 상자 내부 상태를 모르는 상태에서, 고양이의 생사는 물리적으로 어떤 상태일까요? 학생의 솔직한 생각을 선택해주세요. (정답은 없으며, 학생의 사전 물리 직관을 파악하기 위함입니다)
+                    </p>
+                </div>
+
+                <div class="choices-container">
+                    <div class="choice-card" onclick="selectPrediction(1, '살아 있다')">
+                        <div class="choice-badge">1</div>
+                        <div class="choice-text">살아 있다</div>
+                    </div>
+                    <div class="choice-card" onclick="selectPrediction(2, '죽어 있다')">
+                        <div class="choice-badge">2</div>
+                        <div class="choice-text">죽어 있다</div>
+                    </div>
+                    <div class="choice-card" onclick="selectPrediction(3, '살아 있음과 죽어 있음이 모두 포함된 상태이다 (중첩)')">
+                        <div class="choice-badge">3</div>
+                        <div class="choice-text">살아 있음과 죽어 있음이 모두 포함된 상태이다 (중첩)</div>
+                    </div>
+                    <div class="choice-card" onclick="selectPrediction(4, '알 수 없다')">
+                        <div class="choice-badge">4</div>
+                        <div class="choice-text">알 수 없다</div>
+                    </div>
+                </div>
+
+                <!-- Live reaction dialog from Schrödinger and Bohr -->
+                <div class="peek-container" id="prediction-peek">
+                    <div class="peek-title">과학자들의 첫인상 코멘트</div>
+                    
+                    <div class="scientist-peek-bubble sch">
+                        <div class="avatar-small sch"></div>
+                        <div class="peek-speech">
+                            <div class="peek-name">에르빈 슈뢰딩거 <span class="role">Schrödinger</span></div>
+                            <span id="speech-schrodinger">...</span>
+                        </div>
+                    </div>
+
+                    <div class="scientist-peek-bubble bohr">
+                        <div class="avatar-small bohr"></div>
+                        <div class="peek-speech">
+                            <div class="peek-name">닐스 보어 <span class="role">Bohr</span></div>
+                            <span id="speech-bohr">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-bar" style="margin-top: 25px;">
+                    <button class="btn btn-primary" id="btn-goto-step3" onclick="goToStep(3)" disabled>
+                        관측 단계로 이동 ➡️
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: OBSERVATION -->
+            <div class="step-content" id="content-step-3">
+                <div class="panel-header">
+                    <div class="panel-step-label">3단계: 관측하기</div>
+                    <h2 class="panel-title">결과 확인 및 양자 상태 붕괴</h2>
+                </div>
+
+                <div class="desc-card" style="margin-bottom: 20px;">
+                    <p>양자역학에서 <strong>'관측(Measurement)'</strong>은 대단히 무거운 의미를 지닙니다. 상자를 열기 전까지는 알 수 없는 확률 중첩 상태였지만, 상자를 열고 확인을 수행하는 순간 단 하나의 결과로 강제 수렴(파동함수 붕괴)합니다.</p>
+                    <p style="margin-top: 10px; font-weight: 500; color: var(--primary);">
+                        아래 버튼을 눌러 상자를 관측해보세요.
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" id="btn-observe" onclick="observeBox()">
+                        👁️ 상자 열기 (관측하기)
+                    </button>
+                </div>
+
+                <!-- After Observation Questions -->
+                <div id="post-observation-section" style="display: none; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
+                    <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--primary);">관측 사후 탐구 질문</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px;">
+                        고양이가 <strong id="val-obs-result" style="color: #fff;">생존/사망</strong>한 결과가 나타났습니다. 그렇다면 <strong>상자를 열기 바로 직전에도 고양이는 이 상태였을까요?</strong>
+                    </p>
+
+                    <div class="choices-container">
+                        <div class="choice-card post-choice" onclick="selectPostObservation(1, '그렇다')">
+                            <div class="choice-badge">1</div>
+                            <div class="choice-text">그렇다 (상자를 열기 전에도 이 상태로 결정되어 있었다)</div>
+                        </div>
+                        <div class="choice-card post-choice" onclick="selectPostObservation(2, '아니다')">
+                            <div class="choice-badge">2</div>
+                            <div class="choice-text">아니다 (열기 전에는 중첩 상태였으며, 여는 순간 결정되었다)</div>
+                        </div>
+                        <div class="choice-card post-choice" onclick="selectPostObservation(3, '알 수 없다')">
+                            <div class="choice-badge">3</div>
+                            <div class="choice-text">알 수 없다 (관측 전의 상태는 정의할 수 없거나 무의미하다)</div>
+                        </div>
+                    </div>
+
+                    <div class="actions-bar" style="margin-top: 25px;">
+                        <button class="btn btn-primary" id="btn-goto-step4" onclick="goToStep(4)" disabled>
+                            대립 토론방 입장 ➡️
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: CHAT/DEBATE -->
+            <div class="step-content" id="content-step-4" style="padding: 0; flex: 1; height: 100%;">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-title">
+                            <span class="chat-title-text">⚛️ 양자 대립 토론방 (3자 대화)</span>
+                            <span class="chat-badge" id="chat-model-info">Gemini-2.0-Flash Active</span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="finishSimulation()" style="font-size: 0.75rem; padding: 6px 12px;">
+                            토론 종료 및 정리 📊
+                        </button>
+                    </div>
+                    
+                    <div class="chat-main-area">
+                        <!-- Left Panel: Scientists Profiles (Blueprint inspired) -->
+                        <div class="debate-scientists-sidebar">
+                            <div class="scientist-profile-card" id="profile-sch">
+                                <div class="sci-photo sch"></div>
+                                <div class="sci-info">
+                                    <div class="sci-header">
+                                        <span class="sci-name">에르빈 슈뢰딩거</span>
+                                        <span class="sci-indicator sch" id="ind-sch"></span>
+                                    </div>
+                                    <span class="sci-title">이론물리학자</span>
+                                    <span class="sci-years">1887 - 1961</span>
+                                </div>
+                            </div>
+                            <div class="scientist-profile-card" id="profile-bohr">
+                                <div class="sci-photo bohr"></div>
+                                <div class="sci-info">
+                                    <div class="sci-header">
+                                        <span class="sci-name">닐스 보어</span>
+                                        <span class="sci-indicator bohr" id="ind-bohr"></span>
+                                    </div>
+                                    <span class="sci-title">코펜하겐 학파</span>
+                                    <span class="sci-years">1885 - 1962</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Panel: Chat Messages -->
+                        <div class="chat-messages-area">
+                            <div class="chat-messages" id="chat-messages-box">
+                                <!-- Message templates will be dynamically rendered here -->
+                            </div>
+                            
+                            <div class="typing-indicator" id="chat-typing-indicator" style="display: none;">
+                                <div class="typing-dots">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                                <span id="typing-text">슈뢰딩거 박사와 보어 박사가 답변을 의논 중입니다...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-panel">
+                        <div class="chat-input-wrapper">
+                            <input type="text" class="chat-input" id="chat-user-input" placeholder="슈뢰딩거와 보어에게 질문을 던져보세요... (예: '중첩 상태란 정말 존재하나요?')" onkeypress="handleChatKey(event)">
+                        </div>
+                        <button class="btn btn-primary" id="btn-chat-send" onclick="sendChatMessage()">
+                            전송
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: SUMMARY REPORT -->
+            <div class="step-content" id="content-step-5">
+                <div class="summary-dashboard">
+                    <h2 class="summary-title-main">학습 결과 및 종합 정리</h2>
+                    <p class="summary-subtitle">오늘 탐구하신 양자역학 해석의 흐름을 한눈에 살펴보세요.</p>
+                    
+                    <div class="summary-grid">
+                        <!-- Left: Student Choices -->
+                        <div class="summary-card">
+                            <div class="summary-card-title">
+                                📊 나의 생각 흔적 (Concept Record)
+                            </div>
+                            <div class="summary-flow">
+                                <div class="flow-item">
+                                    <div class="flow-label">1단계: 상자 닫기 직후 (나의 예측)</div>
+                                    <div class="flow-val" id="summary-val-predict">...</div>
+                                </div>
+                                <div class="flow-item">
+                                    <div class="flow-label">2단계: 관측된 고양이 생사</div>
+                                    <div class="flow-val" id="summary-val-result">...</div>
+                                </div>
+                                <div class="flow-item">
+                                    <div class="flow-label">3단계: 관측 이전 상태에 대한 의견</div>
+                                    <div class="flow-val" id="summary-val-post">...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Scientists stance -->
+                        <div class="summary-card">
+                            <div class="summary-card-title">
+                                💡 과학자 대립 구도 요약
+                            </div>
+                            <div class="opinion-comparison">
+                                <div class="opinion-sc-item sch">
+                                    <div class="opinion-sc-name" style="color: var(--schrodinger);">에르빈 슈뢰딩거 (Erwin Schrödinger)</div>
+                                    <div class="opinion-sc-text">
+                                        "거시 세계(고양이)에서 중첩 개념을 그대로 물리적 실재로 믿는 것은 역설적입니다. 저는 양자 중첩 해석(코펜하겐)의 모순점과 물리적 실재를 기술하는 양자론의 불완전성을 지적하기 위해 이 실험을 설계했습니다."
+                                    </div>
+                                </div>
+                                <div class="opinion-sc-item bohr">
+                                    <div class="opinion-sc-name" style="color: var(--bohr);">닐스 보어 (Niels Bohr)</div>
+                                    <div class="opinion-sc-text">
+                                        "물리학은 실재를 설명하는 이론이 아니라 관측 결과를 예측하고 수학적으로 기술하는 도구입니다. 관측 이전의 상태를 일상 언어(생존/사망)로 추론하고 규정하려 하는 시도 자체가 오류입니다."
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom: Deep questions -->
+                        <div class="summary-card reflection-card">
+                            <div class="summary-card-title" style="border: none; margin-bottom: 5px; color: var(--primary);">
+                                🤔 생각해 볼 심층 질문 (Reflection Questions)
+                            </div>
+                            <ul class="reflection-list">
+                                <li>
+                                    <strong>질문 1. 관측이란 무엇인가?</strong> 
+                                    - 단순한 인간의 눈으로 보는 것인지, 아니면 거시 물리 계와의 물리적 상호작용(데코히어런스, Decoherence)이 관측을 구성하는가?
+                                </li>
+                                <li>
+                                    <strong>질문 2. 중첩 상태는 '실재'인가, 아니면 지식의 한계인가?</strong>
+                                    - 중첩은 물리적인 실제 결맞음(Coherence) 상태인가, 단지 우리가 열어보기 전까지 몰라서 수학적 확률로 기입한 임시 표기인가?
+                                </li>
+                                <li>
+                                    <strong>질문 3. 과학의 목적은 무엇인가?</strong>
+                                    - 대자연의 실재를 끝내 설명하는 것인가(슈뢰딩거), 아니면 우리가 유용하게 예측할 수 있는 상호작용 규칙을 정립하는 것인가(보어)?
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="resetWholeSimulation()">
+                            🔄 처음 단계로 돌아가 새로 시작하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<script>
+    // State management
+    let currentStep = 1;
+    let studentPrediction = '';
+    let observedResult = '';
+    let postObservationOpinion = '';
+    let currentPredictionId = null;
+    let currentPostOpinionId = null;
+    
+    let chatHistory = [];
+    let isDebateInitialized = false;
+
+    // Component details for Step 1 Click Description
+    const elementExplanations = {
+        atom: {
+            title: "방사성 원자",
+            content: "일정 확률로 붕괴하여 알파 입자(방사선)를 방출할 수 있는 불안정한 미시 양자계입니다. 붕괴 여부는 순수하게 확률적(50%)으로 결정됩니다."
+        },
+        detector: {
+            title: "방사선 가이거 검출기",
+            content: "미세한 방사선 입자라도 감지하면 전기적 펄스 신호를 출력하여 독극물 제어 장치를 활성화시키는 증폭 감지 시스템입니다."
+        },
+        poison: {
+            title: "독극물 방출 장치",
+            content: "검출기로부터 신호(전류)가 입력되는 즉시 릴레이를 거쳐 스프링 망치가 풀려나고, 청산가리 가스가 든 유리 밀폐 유리병을 내리쳐 파괴합니다."
+        },
+        cat: {
+            title: "상자 속 고양이",
+            content: "밀폐 상자 안에서 장치의 결과물(원자 붕괴 -> 독극물 방출)에 지배받는 거시적 생물계입니다. 붕괴 결과에 따라 최종 생존 또는 사망 상태가 결정됩니다."
+        }
+    };
+
+    // Pre-prediction reactions mapping (Instant, fast frontend rendering)
+    const predictionReactions = {
+        1: { // 살아 있다
+            schrodinger: "상자를 열기 전까지는 양자역학적으로 생존과 사망이 공존하는 중첩 상태입니다. 상식적으로 살아만 있다고 못 박을 수는 없지요.",
+            bohr: "관측을 하기 전에는 아직 '살아있다'라고 물리적으로 정의할 수 있는 상태가 없습니다. 관측을 통해서만 규정되니까요."
+        },
+        2: { // 죽어 있다
+            schrodinger: "마찬가지로, 열어보기 전에 고양이가 완전히 사망 상태라고 결론 내리는 것도 타당하지 않습니다. 수학적으로는 붕괴 전후 상태가 얽혀있습니다.",
+            bohr: "동의합니다. 관측 전 상태를 '사망'이라고 고전적인 고정 상태로 단정하는 것은 양자 이론에 어긋납니다."
+        },
+        3: { // 생존과 사망이 함께 포함된 중첩 상태
+            schrodinger: "수학적으로는 두 상태가 함께 포함된 중첩 상태로 기술됩니다. 하지만, 실제 고양이 같은 거대 동물에게 이런 논리를 대입하면 극심한 논리적 역설을 마주하게 됩니다. 그래서 제가 이 실험을 제안한 것입니다.",
+            bohr: "맞습니다. 하지만 조심해야 합니다. 이것은 수학적 상태 표기법(파동함수)일 뿐, 실제로 고양이가 반쯤 살고 반쯤 죽은 기묘한 형태로 상자 속에 존재하는 것은 아닙니다. 오직 관측을 통해서만 현상을 논할 수 있죠."
+        },
+        4: { // 알 수 없다
+            schrodinger: "흥미로운 생각입니다. 그렇지만 단순히 모른다(Ignorance)를 의미하는 것과, 실제로 물리적으로 중첩(Superposition)되어 있는 것은 해석의 층위가 다릅니다. 양자역학은 중첩을 말하니까요.",
+            bohr: "관측하지 않은 상태에 대해 물리적 언어(살았는지 죽었는지)로 서술하거나 고심할 필요는 없습니다. 관측만이 실제를 낳기 때문입니다."
+        }
+    };
+
+    // Initialize layout
+    window.addEventListener('DOMContentLoaded', () => {
+        updateStepUI();
+    });
+
+    // Tooltip handling
+    function showTooltip(type, event) {
+        if (currentStep !== 1) return; // Allow interaction with tooltip only in Step 1
+        
+        const tooltip = document.getElementById('tooltip');
+        const data = elementExplanations[type];
+        
+        document.getElementById('tooltip-title').innerText = data.title;
+        document.getElementById('tooltip-content').innerText = data.content;
+        
+        tooltip.classList.add('active');
+        
+        // Position tooltip near the click location
+        const targetRect = event.currentTarget.getBoundingClientRect();
+        const parentRect = document.getElementById('box-chamber').getBoundingClientRect();
+        
+        const topPos = targetRect.top - parentRect.top + targetRect.height + 8;
+        const leftPos = targetRect.left - parentRect.left + (targetRect.width/2) - 120;
+        
+        tooltip.style.top = `${topPos}px`;
+        tooltip.style.left = `${leftPos}px`;
+        
+        // Auto hide tooltip on body click (except items)
+        event.stopPropagation();
+    }
+
+    document.addEventListener('click', () => {
+        document.getElementById('tooltip').classList.remove('active');
+    });
+
+    // Handle steps visual state
+    function updateStepUI() {
+        // Progress bar calculation
+        const percent = ((currentStep - 1) / 3) * 100;
+        document.getElementById('step-progress').style.width = `${percent}%`;
+
+        // Update step nodes active / completed class
+        for (let i = 1; i <= 4; i++) {
+            const node = document.getElementById(`step-node-${i}`);
+            node.classList.remove('active', 'completed');
+            if (i < currentStep) {
+                node.classList.add('completed');
+            } else if (i === currentStep) {
+                node.classList.add('active');
+            }
+        }
+
+        // Show/Hide step contents
+        for (let i = 1; i <= 5; i++) {
+            const content = document.getElementById(`content-step-${i}`);
+            if (content) {
+                content.classList.remove('active');
+                if (i === currentStep) {
+                    content.classList.add('active');
+                }
+            }
+        }
+    }
+
+    // Step navigation helper
+    function goToStep(step) {
+        currentStep = step;
+        updateStepUI();
+        
+        if (currentStep === 4 && !isDebateInitialized) {
+            initDebateSession();
+        }
+    }
+
+    function jumpToStep(step) {
+        // Only allow clicking back to step 1
+        if (step === 1 && currentStep <= 4) {
+            resetSim();
+            goToStep(1);
+        }
+    }
+
+    // Phase 1 -> Phase 2: Start Experiment (Close Box)
+    function startExperiment() {
+        const lid = document.getElementById('box-lid');
+        
+        // Close animation
+        lid.classList.add('closed');
+        document.getElementById('sim-status-desc').innerText = "상자가 닫히는 중입니다...";
+        document.getElementById('btn-start-experiment').disabled = true;
+
+        setTimeout(() => {
+            // Make opaque and sealed
+            lid.classList.add('opaque');
+            document.getElementById('lid-status-text').innerText = "양자 밀폐 (관측 불가)";
+            document.getElementById('sim-status-desc').innerText = "상자가 밀폐되어 내부 구성 물질들이 중첩 상태에 돌입했습니다.";
+            document.getElementById('box-chamber').classList.add('superposition-active');
+            
+            // Advance to Phase 2
+            goToStep(2);
+        }, 1100);
+    }
+
+    // Phase 2: Handle Predictions
+    function selectPrediction(id, text) {
+        if (currentPredictionId !== null) return; // Lock choices
+        
+        currentPredictionId = id;
+        studentPrediction = text;
+
+        // Visual selection update
+        const cards = document.querySelectorAll('#content-step-2 .choice-card');
+        cards.forEach((card, idx) => {
+            if (idx + 1 === id) {
+                card.classList.add('selected');
+            }
+            card.classList.add('locked');
+        });
+
+        // Set Scientist reaction texts instantly
+        const rx = predictionReactions[id];
+        document.getElementById('speech-schrodinger').innerText = rx.schrodinger;
+        document.getElementById('speech-bohr').innerText = rx.bohr;
+
+        // Show reaction peek panel
+        document.getElementById('prediction-peek').classList.add('visible');
+        
+        // Enable next step button
+        document.getElementById('btn-goto-step3').disabled = false;
+        document.getElementById('sim-status-desc').innerText = `사전 예측 완료: "${text}"`;
+    }
+
+    // Phase 3: Observe Box (Open Box)
+    function observeBox() {
+        document.getElementById('btn-observe').disabled = true;
+        
+        // 50% outcome
+        const isAlive = Math.random() > 0.5;
+        observedResult = isAlive ? '생존' : '사망';
+
+        // Apply physical layout changes in box representation
+        const needle = document.getElementById('detector-needle');
+        const led = document.getElementById('detector-led');
+        const hammer = document.getElementById('vial-hammer');
+        const glass = document.getElementById('vial-glass');
+        const liquid = document.getElementById('vial-liquid');
+        const catVisual = document.getElementById('cat-visual');
+        const catHalo = document.getElementById('cat-halo');
+        const catLabel = document.getElementById('cat-label');
+        const wire1 = document.getElementById('wire-detector-poison');
+        const wire2 = document.getElementById('wire-poison-cat');
+
+        if (isAlive) {
+            // Atom stayed stable, no detector spike, vial intact, cat happy
+            needle.setAttribute('x2', '35'); // stable needle position
+            led.setAttribute('fill', '#22c55e'); // stable green light
+            
+            // Cat is happy
+            document.getElementById('cat-eye-l').setAttribute('r', '2.5');
+            document.getElementById('cat-eye-r').setAttribute('r', '2.5');
+            catLabel.innerText = "고양이 (생존)";
+            
+            // Overlay Alive
+            document.getElementById('box-result-icon').innerText = "😺";
+            document.getElementById('box-result-icon').className = "result-icon alive";
+            document.getElementById('box-result-title').innerText = "결과: 생존 (Alive)";
+            document.getElementById('box-result-desc').innerText = "상자를 관측하는 시점에 원자가 붕괴하지 않아 독극물이 안전하게 방출되지 않았으며 고양이는 살아있는 상태로 결정되었습니다.";
+        } else {
+            // Atom decayed, detector spikes, hammer falls, vial breaks, cat ghostly
+            needle.setAttribute('x2', '65'); // spikes right
+            led.setAttribute('fill', '#ef4444'); // red alarm
+            
+            // Wire currents active
+            wire1.classList.add('active');
+            wire2.classList.add('active');
+
+            // Hammer hits poison flask
+            hammer.style.transform = "rotate(45deg)";
+            
+            // Vial glass cracked
+            glass.setAttribute('stroke', '#7f1d1d');
+            liquid.setAttribute('opacity', '0.2');
+            
+            // Cat peaceful sleep
+            catVisual.style.opacity = "0.45";
+            catHalo.style.display = "block";
+            catLabel.innerText = "고양이 (사망)";
+            
+            // Overlay Dead
+            document.getElementById('box-result-icon').innerText = "👻";
+            document.getElementById('box-result-icon').className = "result-icon dead";
+            document.getElementById('box-result-title').innerText = "결과: 사망 (Decayed)";
+            document.getElementById('box-result-desc').innerText = "상자를 관측하는 시점에 원자가 붕괴하여 검출기와 독가스를 작동시켰으며, 고양이는 조용히 사망한 상태로 결정되었습니다.";
+        }
+
+        // Open Lid
+        const lid = document.getElementById('box-lid');
+        lid.classList.remove('opaque');
+        lid.classList.remove('closed');
+        document.getElementById('lid-status-text').innerText = "상자 열림 (관측 완료)";
+
+        // Display results overlay inside the container
+        setTimeout(() => {
+            document.getElementById('box-result-overlay').classList.add('active');
+            document.getElementById('val-obs-result').innerText = observedResult;
+            document.getElementById('post-observation-section').style.display = 'block';
+            document.getElementById('sim-status-desc').innerText = `관측이 종결되어 고양이는 '${observedResult}' 상태로 붕괴되었습니다.`;
+        }, 800);
+    }
+
+    // Phase 3: Post-observation opinion selection
+    function selectPostObservation(id, text) {
+        if (currentPostOpinionId !== null) return;
+        
+        currentPostOpinionId = id;
+        postObservationOpinion = text;
+
+        const cards = document.querySelectorAll('#content-step-3 .post-choice');
+        cards.forEach((card, idx) => {
+            if (idx + 1 === id) {
+                card.classList.add('selected');
+            }
+            card.classList.add('locked');
+        });
+
+        // Enable debate room button
+        document.getElementById('btn-goto-step4').disabled = false;
+    }
+
+    // Speaker Active Highlighting Helper
+    function setSpeakerStatus(status) {
+        const schCard = document.getElementById('profile-sch');
+        const bohrCard = document.getElementById('profile-bohr');
+        const schInd = document.getElementById('ind-sch');
+        const bohrInd = document.getElementById('ind-bohr');
+
+        if (!schCard || !bohrCard) return;
+
+        schCard.classList.remove('active-speaker');
+        bohrCard.classList.remove('active-speaker');
+        schInd.classList.remove('speaking');
+        bohrInd.classList.remove('speaking');
+
+        if (status === 'sch') {
+            schCard.classList.add('active-speaker');
+            schInd.classList.add('speaking');
+        } else if (status === 'bohr') {
+            bohrCard.classList.add('active-speaker');
+            bohrInd.classList.add('speaking');
+        } else if (status === 'both') {
+            schCard.classList.add('active-speaker');
+            bohrCard.classList.add('active-speaker');
+            schInd.classList.add('speaking');
+            bohrInd.classList.add('speaking');
+        }
+    }
+
+    // Phase 4: Chat Room API Call
+    async function initDebateSession() {
+        const typing = document.getElementById('chat-typing-indicator');
+        const typingText = document.getElementById('typing-text');
+        
+        typingText.innerText = "두 학자가 탐구 결과에 대해 대화를 시작합니다...";
+        typing.style.display = 'flex';
+        setSpeakerStatus('both');
+        
+        try {
+            const response = await fetch('/init_debate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prediction: studentPrediction,
+                    post_observation: postObservationOpinion,
+                    observed_result: observedResult
+                })
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || errData.detail || `HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            typing.style.display = 'none';
+            
+            if (!data.schrodinger || !data.bohr) {
+                throw new Error("Invalid response format from server");
+            }
+            
+            setSpeakerStatus('sch');
+
+            // Add Schrödinger's opening remark
+            appendChatMessage('sch', data.schrodinger, '에르빈 슈뢰딩거', '이론물리학자');
+            chatHistory.push({ role: 'ai', author: '슈뢰딩거', content: data.schrodinger });
+
+            // Stagger Bohr's reply after a small delay for realistic flow
+            setTimeout(() => {
+                typingText.innerText = "닐스 보어가 답변을 준비 중입니다...";
+                typing.style.display = 'flex';
+                setSpeakerStatus('bohr');
+                
+                setTimeout(() => {
+                    typing.style.display = 'none';
+                    appendChatMessage('bohr', data.bohr, '닐스 보어', '코펜하겐 학파');
+                    chatHistory.push({ role: 'ai', author: '보어', content: data.bohr });
+                    setTimeout(() => setSpeakerStatus('none'), 2000);
+                }, 1000);
+            }, 1200);
+
+            // Update model badges
+            if (data.model) {
+                document.getElementById('chat-model-info').innerText = `${data.model} Active`;
+                document.getElementById('model-tag').innerText = `${data.model} Connected`;
+            }
+
+            isDebateInitialized = true;
+        } catch (err) {
+            console.error("Init Debate Error:", err);
+            typing.style.display = 'none';
+            setSpeakerStatus('sch');
+            
+            // Fallback default greetings
+            const fallbackSch = `슈뢰딩거: 안녕하신가! 관측 전 예측으로 '${studentPrediction}'을 골랐고, 관측 후 의견으론 '${postObservationOpinion}'을 선택했더군. 고양이가 '${observedResult}'인 상태로 결정된 것은 흥미롭지만, 이를 논리적으로 받아들이는 방식에 대해 내 입장을 설명해주겠네.`;
+            const fallbackBohr = `보어: 반갑습니다. 슈뢰딩거 박사님의 이 사고실험은 직관을 깨트리는 훌륭한 비유지만, 관측 이전의 상태를 마치 실재하는 것마냥 '어떤 상태였다'라고 서술하려는 고전적 편견을 버리지 않으면 양자역학을 이해할 수 없답니다.`;
+            
+            appendChatMessage('sch', fallbackSch, '에르빈 슈뢰딩거', '이론물리학자');
+            chatHistory.push({ role: 'ai', author: '슈뢰딩거', content: fallbackSch });
+
+            setTimeout(() => {
+                typingText.innerText = "닐스 보어가 반론을 준비 중입니다...";
+                typing.style.display = 'flex';
+                setSpeakerStatus('bohr');
+                
+                setTimeout(() => {
+                    typing.style.display = 'none';
+                    appendChatMessage('bohr', fallbackBohr, '닐스 보어', '코펜하겐 학파');
+                    chatHistory.push({ role: 'ai', author: '보어', content: fallbackBohr });
+                    setTimeout(() => setSpeakerStatus('none'), 2000);
+                }, 800);
+            }, 1200);
+            
+            isDebateInitialized = true;
+        }
+    }
+
+    async function sendChatMessage() {
+        const input = document.getElementById('chat-user-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Append user chat bubble
+        appendChatMessage('user', text, '학생', '탐구자');
+        input.value = '';
+        setSpeakerStatus('none');
+
+        // Add to history
+        chatHistory.push({ role: 'user', content: text });
+
+        // Show typing indicator
+        const typing = document.getElementById('chat-typing-indicator');
+        const typingText = document.getElementById('typing-text');
+        typingText.innerText = "두 학자가 질문을 검토하고 있습니다...";
+        typing.style.display = 'flex';
+        setSpeakerStatus('both');
+
+        // Auto-scroll to bottom of chat
+        const chatContainer = document.getElementById('chat-messages-box');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        try {
+            const response = await fetch('/debate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    history: chatHistory,
+                    prediction: studentPrediction,
+                    post_observation: postObservationOpinion,
+                    observed_result: observedResult
+                })
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || errData.detail || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            typing.style.display = 'none';
+
+            if (data.error) {
+                throw new Error(data.message || "Unknown server error");
+            }
+            
+            if (!data.schrodinger || !data.bohr) {
+                throw new Error("Invalid response format from server");
+            }
+
+            // Append Schrödinger
+            setSpeakerStatus('sch');
+            appendChatMessage('sch', data.schrodinger, '에르빈 슈뢰딩거', '이론물리학자');
+            chatHistory.push({ role: 'ai', author: '슈뢰딩거', content: data.schrodinger });
+
+            // Stagger Bohr
+            setTimeout(() => {
+                typingText.innerText = "닐스 보어가 반론을 작성 중입니다...";
+                typing.style.display = 'flex';
+                setSpeakerStatus('bohr');
+                
+                setTimeout(() => {
+                    typing.style.display = 'none';
+                    appendChatMessage('bohr', data.bohr, '닐스 보어', '코펜하겐 학파');
+                    chatHistory.push({ role: 'ai', author: '보어', content: data.bohr });
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    
+                    // Turn off lights after some time
+                    setTimeout(() => setSpeakerStatus('none'), 2000);
+                }, 1000);
+            }, 1200);
+
+            // Update model badge
+            if (data.model) {
+                document.getElementById('chat-model-info').innerText = `${data.model} Active`;
+            }
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        } catch (e) {
+            console.error("Chat debate error:", e);
+            typing.style.display = 'none';
+            setSpeakerStatus('none');
+            
+            let displayError = e.message;
+            if (typeof displayError === 'object') {
+                displayError = JSON.stringify(displayError);
+            }
+            const errorMessage = `죄송합니다. 오류가 발생했습니다: ${displayError}`;
+            appendChatMessage('sch', errorMessage, '시스템 에러');
+        }
+    }
+
+    function handleChatKey(event) {
+        if (event.keyCode === 13) {
+            sendChatMessage();
+        }
+    }
+
+    function appendChatMessage(senderType, message, name, role = '') {
+        const chatBox = document.getElementById('chat-messages-box');
+        const group = document.createElement('div');
+        group.className = `msg-group ${senderType}`;
+        
+        group.innerHTML = `
+            <div class="msg-body">
+                <div class="msg-info">
+                    <span class="name">${name}</span>
+                    ${role ? `<span class="role">${role}</span>` : ''}
+                </div>
+                <div class="msg-bubble">${message}</div>
+            </div>
+        `;
+        
+        chatBox.appendChild(group);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Step 4 -> Step 5: Finish Debate and view Summary Dashboard
+    function finishSimulation() {
+        // Save summary elements
+        document.getElementById('summary-val-predict').innerText = studentPrediction;
+        document.getElementById('summary-val-result').innerText = `관측결과: 고양이 '${observedResult}' 확인됨`;
+        document.getElementById('summary-val-post').innerText = postObservationOpinion;
+
+        // Show reset control
+        document.getElementById('btn-reset').style.display = 'inline-flex';
+
+        // Go to summary page
+        goToStep(5);
+        document.getElementById('sim-status-desc').innerText = "양자역학 해석 탐구가 마무리되었습니다. 보고서를 확인해보세요.";
+    }
+
+    // Reset simulator UI elements
+    function resetSim() {
+        // Reset steps logic
+        currentStep = 1;
+        studentPrediction = '';
+        observedResult = '';
+        postObservationOpinion = '';
+        currentPredictionId = null;
+        currentPostOpinionId = null;
+        chatHistory = [];
+        isDebateInitialized = false;
+
+        // Reset Box styles
+        const lid = document.getElementById('box-lid');
+        lid.className = 'box-lid';
+        document.getElementById('lid-status-text').innerText = "상자 열림";
+        document.getElementById('box-chamber').className = 'box-container';
+        document.getElementById('box-result-overlay').className = 'result-overlay';
+
+        // Reset components SVG
+        const needle = document.getElementById('detector-needle');
+        const led = document.getElementById('detector-led');
+        const hammer = document.getElementById('vial-hammer');
+        const glass = document.getElementById('vial-glass');
+        const liquid = document.getElementById('vial-liquid');
+        const catVisual = document.getElementById('cat-visual');
+        const catHalo = document.getElementById('cat-halo');
+        const catLabel = document.getElementById('cat-label');
+        const wire1 = document.getElementById('wire-detector-poison');
+        const wire2 = document.getElementById('wire-poison-cat');
+
+        needle.setAttribute('x2', '38');
+        led.setAttribute('fill', '#64748b');
+        hammer.style.transform = "rotate(0deg)";
+        glass.setAttribute('stroke', '#a1a1aa');
+        liquid.setAttribute('opacity', '0.85');
+        
+        catVisual.style.opacity = "1";
+        catHalo.style.display = "none";
+        document.getElementById('cat-eye-l').setAttribute('r', '2.5');
+        document.getElementById('cat-eye-r').setAttribute('r', '2.5');
+        catLabel.innerText = "고양이";
+
+        wire1.className = 'conn-wire w1';
+        wire2.className = 'conn-wire w2';
+
+        // Reset panel choice buttons
+        const cards = document.querySelectorAll('.choice-card');
+        cards.forEach(card => {
+            card.classList.remove('selected', 'locked');
+        });
+        
+        document.getElementById('prediction-peek').classList.remove('visible');
+        document.getElementById('btn-goto-step3').disabled = true;
+        document.getElementById('btn-goto-step4').disabled = true;
+        document.getElementById('btn-start-experiment').disabled = false;
+        document.getElementById('btn-observe').disabled = false;
+        document.getElementById('post-observation-section').style.display = 'none';
+
+        // Clear chat messages
+        document.getElementById('chat-messages-box').innerHTML = '';
+        setSpeakerStatus('none');
+
+        document.getElementById('btn-reset').style.display = 'none';
+        document.getElementById('sim-status-desc').innerText = "각 실험 장치를 클릭하여 그 역할을 살펴보세요.";
+        
+        updateStepUI();
+    }
+
+    function resetWholeSimulation() {
+        resetSim();
+    }
+</script>
+
+</body>
+</html>
