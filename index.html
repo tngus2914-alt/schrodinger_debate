@@ -38,6 +38,7 @@
 
         body {
             font-family: 'Inter', 'Pretendard', sans-serif;
+            font-size: 16px;
             background-color: var(--bg-base);
             color: var(--text-main);
             height: 100vh;
@@ -59,7 +60,7 @@
 
         .header-title h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 800;
             background: linear-gradient(90deg, #00f0ff 0%, #3b82f6 100%);
             -webkit-background-clip: text;
@@ -68,7 +69,7 @@
         }
 
         .header-title p {
-            font-size: 0.8rem;
+            font-size: 0.88rem;
             color: var(--text-dim);
             margin-top: 3px;
         }
@@ -165,7 +166,7 @@
 
         .step-text {
             margin-top: 8px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--text-dim);
             white-space: nowrap;
@@ -549,7 +550,7 @@
 
         .panel-step-label {
             font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--primary);
             text-transform: uppercase;
@@ -559,7 +560,7 @@
 
         .panel-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -585,12 +586,12 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
-            line-height: 1.6;
+            padding: 22px;
+            line-height: 1.7;
         }
 
         .desc-card p {
-            font-size: 0.9rem;
+            font-size: 0.98rem;
             color: var(--text-dim);
             margin-bottom: 12px;
         }
@@ -604,7 +605,7 @@
             border-left: 3px solid var(--primary);
             padding: 12px 16px;
             border-radius: 0 8px 8px 0;
-            font-size: 0.85rem;
+            font-size: 0.92rem;
             color: var(--primary);
         }
 
@@ -620,7 +621,7 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 16px 20px;
+            padding: 18px 22px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -637,7 +638,7 @@
         .choice-card.selected {
             background: rgba(0, 240, 255, 0.05);
             border-color: var(--primary);
-            box-shadow: 0 0 12px var(--border-glow);
+            box-shadow: 0 0 0 1px var(--primary), 0 0 16px var(--border-glow);
         }
 
         .choice-card.locked {
@@ -650,15 +651,15 @@
         }
 
         .choice-badge {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: #1e293b;
             border: 1px solid #334155;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-dim);
             transition: var(--transition);
@@ -671,7 +672,7 @@
         }
 
         .choice-text {
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 500;
             color: var(--text-main);
         }
@@ -737,8 +738,8 @@
             border: 1px solid var(--border-color);
             padding: 12px 16px;
             border-radius: 0 12px 12px 12px;
-            font-size: 0.85rem;
-            line-height: 1.5;
+            font-size: 0.93rem;
+            line-height: 1.6;
             position: relative;
         }
 
@@ -768,8 +769,8 @@
         .btn {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.85rem;
-            padding: 12px 24px;
+            font-size: 0.93rem;
+            padding: 13px 25px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
@@ -853,7 +854,7 @@
             border-radius: 4px;
         }
 
-        /* 2열 메인 영역 */
+        /* 대화창 메인 영역 */
         .chat-main-area {
             display: flex;
             flex: 1;
@@ -861,123 +862,11 @@
             background: rgba(2, 6, 23, 0.2);
         }
 
-        /* 과학자 프로필 사이드바 */
-        .debate-scientists-sidebar {
-            width: 260px;
-            border-right: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.6);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .scientist-profile-card {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        .scientist-profile-card.active-speaker {
-            border-color: var(--primary);
-            background: rgba(0, 240, 255, 0.03);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
-        }
-
-        .sci-photo {
-            width: 56px;
-            height: 56px;
-            border-radius: 10px;
-            background-size: cover;
-            background-position: center;
-            border: 1.5px solid;
-            flex-shrink: 0;
-        }
-
-        .sci-photo.sch {
-            border-color: var(--schrodinger);
-            background-image: url('/static/images/%EC%8A%88%EB%A2%B0%EB%94%A9%EA%B1%B0.png');
-        }
-
-        .sci-photo.bohr {
-            border-color: var(--bohr);
-            background-image: url('/static/images/%EB%8B%90%EC%8A%A4%20%EB%B3%B4%EC%96%B4.png');
-        }
-
-        .sci-info {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .sci-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .sci-name {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sci-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--text-muted);
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-
-        .sci-indicator.sch.speaking {
-            background: var(--schrodinger);
-            box-shadow: 0 0 8px var(--schrodinger);
-            animation: pulse-indicator-sch 1s infinite alternate;
-        }
-
-        .sci-indicator.bohr.speaking {
-            background: var(--bohr);
-            box-shadow: 0 0 8px var(--bohr);
-            animation: pulse-indicator-bohr 1s infinite alternate;
-        }
-
-        @keyframes pulse-indicator-sch {
-            0% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-        @keyframes pulse-indicator-bohr {
-            0% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-
-        .sci-title {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin-top: 2px;
-        }
-
-        .sci-years {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-
         /* 메시지 윈도우 영역 */
         .chat-messages-area {
             flex: 1;
+            width: 100%;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -1044,10 +933,25 @@
         }
 
         @media (max-width: 600px) {
+            .chat-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .chat-actions {
+                width: 100%;
+            }
+
             .msg-group {
                 max-width: 95%;
                 gap: 8px;
             }
+
+            .chat-messages {
+                padding: 16px 12px;
+            }
+
             .chat-profile-img {
                 width: 40px;
                 height: 40px;
@@ -1080,8 +984,8 @@
         .msg-bubble {
             padding: 12px 16px;
             border-radius: 16px;
-            font-size: 0.88rem;
-            line-height: 1.5;
+            font-size: 0.98rem;
+            line-height: 1.65;
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--border-color);
             color: var(--text-main);
@@ -1130,7 +1034,7 @@
             padding: 12px 16px;
             color: white;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 0.98rem;
             transition: var(--transition);
         }
 
@@ -1182,7 +1086,7 @@
 
         .summary-title-main {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 800;
             text-align: center;
             background: linear-gradient(90deg, var(--primary) 0%, #3b82f6 100%);
@@ -1192,7 +1096,7 @@
         }
 
         .summary-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-dim);
             text-align: center;
             margin-bottom: 10px;
@@ -1219,7 +1123,7 @@
 
         .summary-card-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
+            font-size: 1.05rem;
             font-weight: 700;
             margin-bottom: 15px;
             display: flex;
@@ -1242,14 +1146,14 @@
         }
 
         .flow-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
         }
 
         .flow-val {
-            font-size: 0.9rem;
+            font-size: 0.98rem;
             font-weight: 600;
             color: var(--text-main);
             padding: 8px 12px;
@@ -1280,15 +1184,15 @@
         }
 
         .opinion-sc-name {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: bold;
             margin-bottom: 4px;
         }
 
         .opinion-sc-text {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--text-dim);
-            line-height: 1.4;
+            line-height: 1.55;
         }
 
         .reflection-card {
@@ -1301,13 +1205,13 @@
             padding-left: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
 
         .reflection-list li {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-dim);
-            line-height: 1.5;
+            line-height: 1.65;
         }
 
         .reflection-list li strong {
@@ -1429,9 +1333,63 @@
             margin-bottom: 14px;
         }
         .vote-stance {
-            font-size: 0.85rem;
+            font-size: 0.92rem;
             line-height: 1.6;
             color: var(--text-dim);
+        }
+
+        @media (max-width: 600px) {
+            .header-title h1 {
+                font-size: 1.3rem;
+            }
+
+            .header-title p {
+                font-size: 0.8rem;
+            }
+
+            .panel-title {
+                font-size: 1.4rem;
+            }
+
+            .panel-step-label {
+                font-size: 0.76rem;
+            }
+
+            .desc-card {
+                padding: 18px;
+            }
+
+            .desc-card p,
+            .choice-text,
+            .chat-input {
+                font-size: 0.92rem;
+            }
+
+            .choice-card {
+                padding: 15px 16px;
+            }
+
+            .btn {
+                font-size: 0.86rem;
+                padding: 11px 16px;
+            }
+
+            .msg-bubble {
+                font-size: 0.92rem;
+                line-height: 1.55;
+            }
+
+            .summary-title-main {
+                font-size: 1.55rem;
+            }
+
+            .summary-card-title {
+                font-size: 0.98rem;
+            }
+
+            .reflection-list li {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -1635,7 +1593,7 @@
                 </div>
 
                 <div class="desc-card">
-                    <p style="color: var(--primary); font-weight: 600; font-size: 0.95rem; border-left: 2px solid var(--primary); padding-left: 10px;">
+                    <p style="color: var(--primary); font-weight: 600; font-size: 1rem; border-left: 2px solid var(--primary); padding-left: 10px;">
                         상자가 완전히 닫히고 불투명하게 변했습니다. 우리는 상자 안을 직접 들여다볼 수 없습니다.
                     </p>
                     <p style="margin-top: 10px;">
@@ -1684,7 +1642,7 @@
                 </div>
 
                 <div class="actions-bar" style="margin-top: 25px;">
-                    <button class="btn btn-primary" id="btn-goto-step3" onclick="goToStep(3)" disabled>
+                    <button class="btn btn-primary" id="btn-goto-step3" onclick="confirmPredictionAndContinue()" disabled>
                         관측 단계로 이동 ➡️
                     </button>
                 </div>
@@ -1712,8 +1670,8 @@
 
                 <!-- After Observation Questions -->
                 <div id="post-observation-section" style="display: none; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
-                    <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--primary);">관측 사후 탐구 질문</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px;">
+                    <h3 style="font-size: 1.08rem; font-weight: 600; margin-bottom: 12px; color: var(--primary);">관측 사후 탐구 질문</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-dim); margin-bottom: 15px;">
                         고양이가 <strong id="val-obs-result" style="color: #fff;">생존/사망</strong>한 결과가 나타났습니다. 그렇다면 <strong>상자를 열기 바로 직전에도 고양이는 이 상태였을까요?</strong>
                     </p>
 
@@ -1733,7 +1691,7 @@
                     </div>
 
                     <div class="actions-bar" style="margin-top: 25px;">
-                        <button class="btn btn-primary" id="btn-goto-step4" onclick="goToStep(4)" disabled>
+                        <button class="btn btn-primary" id="btn-goto-step4" onclick="confirmPostObservationAndContinue()" disabled>
                             대립 토론방 입장 ➡️
                         </button>
                     </div>
@@ -1749,46 +1707,20 @@
                             <span class="chat-badge" id="chat-model-info">Gemini-2.0-Flash Active</span>
                         </div>
                         <div class="chat-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="btn btn-secondary" onclick="downloadChatLog()" style="font-size: 0.75rem; padding: 6px 12px;">
+                            <button class="btn btn-secondary" onclick="downloadChatLog()" style="font-size: 0.82rem; padding: 7px 12px;">
                                 📥 기록 다운로드
                             </button>
-                            <button class="btn btn-secondary" onclick="confirmClearChatLog()" style="font-size: 0.75rem; padding: 6px 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);">
+                            <button class="btn btn-secondary" onclick="confirmClearChatLog()" style="font-size: 0.82rem; padding: 7px 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);">
                                 🗑️ 기록 초기화
                             </button>
-                            <button class="btn btn-secondary" onclick="goToStep(5)" style="font-size: 0.75rem; padding: 6px 12px; border-color: var(--primary);">
+                            <button class="btn btn-secondary" onclick="goToStep(5)" style="font-size: 0.82rem; padding: 7px 12px; border-color: var(--primary);">
                                 토론 종료 및 투표 🗳️
                             </button>
                         </div>
                     </div>
                     
                     <div class="chat-main-area">
-                        <!-- Left Panel: Scientists Profiles (Blueprint inspired) -->
-                        <div class="debate-scientists-sidebar">
-                            <div class="scientist-profile-card" id="profile-sch">
-                                <div class="sci-photo sch"></div>
-                                <div class="sci-info">
-                                    <div class="sci-header">
-                                        <span class="sci-name">에르빈 슈뢰딩거</span>
-                                        <span class="sci-indicator sch" id="ind-sch"></span>
-                                    </div>
-                                    <span class="sci-title">이론물리학자</span>
-                                    <span class="sci-years">1887 - 1961</span>
-                                </div>
-                            </div>
-                            <div class="scientist-profile-card" id="profile-bohr">
-                                <div class="sci-photo bohr"></div>
-                                <div class="sci-info">
-                                    <div class="sci-header">
-                                        <span class="sci-name">닐스 보어</span>
-                                        <span class="sci-indicator bohr" id="ind-bohr"></span>
-                                    </div>
-                                    <span class="sci-title">코펜하겐 학파</span>
-                                    <span class="sci-years">1885 - 1962</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right Panel: Chat Messages -->
+                        <!-- Chat Messages -->
                         <div class="chat-messages-area">
                             <div class="chat-messages" id="chat-messages-box">
                                 <!-- Message templates will be dynamically rendered here -->
@@ -1939,7 +1871,10 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; justify-content: center; margin-top: 15px;">
+                    <div style="display: flex; justify-content: center; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="downloadChatLog()">
+                            📥 학습 데이터 다운로드
+                        </button>
                         <button class="btn btn-primary" onclick="resetWholeSimulation()">
                             🔄 처음 단계로 돌아가 새로 시작하기
                         </button>
@@ -1959,6 +1894,8 @@
     let postObservationOpinion = '';
     let currentPredictionId = null;
     let currentPostOpinionId = null;
+    let pendingPrediction = '';
+    let pendingPostObservationOpinion = '';
     let finalVote = '';
     let currentVoteId = null;
     
@@ -2110,18 +2047,13 @@
 
     // Phase 2: Handle Predictions
     function selectPrediction(id, text) {
-        if (currentPredictionId !== null) return; // Lock choices
-        
         currentPredictionId = id;
-        studentPrediction = text;
+        pendingPrediction = text;
 
         // Visual selection update
         const cards = document.querySelectorAll('#content-step-2 .choice-card');
         cards.forEach((card, idx) => {
-            if (idx + 1 === id) {
-                card.classList.add('selected');
-            }
-            card.classList.add('locked');
+            card.classList.toggle('selected', idx + 1 === id);
         });
 
         // Set Scientist reaction texts instantly
@@ -2134,7 +2066,14 @@
         
         // Enable next step button
         document.getElementById('btn-goto-step3').disabled = false;
-        document.getElementById('sim-status-desc').innerText = `사전 예측 완료: "${text}"`;
+        document.getElementById('sim-status-desc').innerText = `사전 예측 선택 중: "${text}"`;
+    }
+
+    function confirmPredictionAndContinue() {
+        if (!pendingPrediction) return;
+        studentPrediction = pendingPrediction;
+        document.getElementById('sim-status-desc').innerText = `사전 예측 확정: "${studentPrediction}"`;
+        goToStep(3);
     }
 
     // Phase 3: Observe Box (Open Box)
@@ -2217,21 +2156,22 @@
 
     // Phase 3: Post-observation opinion selection
     function selectPostObservation(id, text) {
-        if (currentPostOpinionId !== null) return;
-        
         currentPostOpinionId = id;
-        postObservationOpinion = text;
+        pendingPostObservationOpinion = text;
 
         const cards = document.querySelectorAll('#content-step-3 .post-choice');
         cards.forEach((card, idx) => {
-            if (idx + 1 === id) {
-                card.classList.add('selected');
-            }
-            card.classList.add('locked');
+            card.classList.toggle('selected', idx + 1 === id);
         });
 
         // Enable debate room button
         document.getElementById('btn-goto-step4').disabled = false;
+    }
+
+    function confirmPostObservationAndContinue() {
+        if (!pendingPostObservationOpinion) return;
+        postObservationOpinion = pendingPostObservationOpinion;
+        goToStep(4);
     }
 
     // Speaker Active Highlighting Helper
@@ -2752,6 +2692,8 @@
         postObservationOpinion = '';
         currentPredictionId = null;
         currentPostOpinionId = null;
+        pendingPrediction = '';
+        pendingPostObservationOpinion = '';
         finalVote = '';
         currentVoteId = null;
         chatHistory = [];

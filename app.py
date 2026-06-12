@@ -16,12 +16,12 @@ BASE_DIR = Path(__file__).parent
 env_path = BASE_DIR / ".env"
 load_dotenv(dotenv_path=str(env_path))
 
-# API 키 존재 여부 확인 (콘솔 로그)
-api_key = os.getenv("GOOGLE_API_KEY")
+# API 키 존재 여부 확인 (두 환경변수 이름 모두 지원)
+api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
 if api_key:
-    print(f"DEBUG: GOOGLE_API_KEY is found (length: {len(api_key)})")
+    print(f"DEBUG: Gemini API key is found (length: {len(api_key)})")
 else:
-    print("DEBUG: GOOGLE_API_KEY is MISSING!")
+    print("WARNING: GOOGLE_API_KEY or GEMINI_API_KEY is missing. Local fallback responses will be used.")
 
 app = FastAPI()
 
@@ -138,6 +138,9 @@ def parse_json_response(content) -> dict:
 
 async def invoke_gemini_with_fallback(messages: list) -> tuple:
     """정의된 모델 목록을 순서대로 테스트하여 응답에 성공하는 모델의 결과를 반환합니다."""
+    if not api_key:
+        raise RuntimeError("Gemini API key is not configured")
+
     last_error = None
     for model_name in MODELS_TO_TRY:
         try:
@@ -233,20 +236,25 @@ async def debate(request: DebateRequest):
             "model": working_model
         }
     except Exception as e:
-        error_str = str(e)
         print("\n" + "="*50)
         print("!!! Gemini API 호출 에러 발생 !!!")
         print(f"Error Type: {type(e).__name__}")
-        print(f"Error Details: {error_str}")
+        print(f"Error Details: {e}")
         traceback.print_exc()
         print("="*50 + "\n")
         
         return {
-            "error": True,
-            "message": error_str,
-            "model": "None (All models rate-limited)",
-            "schrodinger": "슈뢰딩거: 생각을 정리하는 도중 일시적인 네트워크 불균형이 일어났네. 조금 뒤 다시 물어봐 주겠나?",
-            "bohr": "보어: 통신 장치에 양자 노이즈가 강하게 낀 모양이군요. 잠시 대기 후 시도해주시기 바랍니다."
+            "model": "Fallback (Local)",
+            "schrodinger": (
+                f"좋은 질문이네. '{request.message}'라는 문제는 관측 이전의 상태를 "
+                "물리적 실재로 볼 수 있는지 묻고 있군. 저는 거시적인 고양이까지 중첩 상태로 "
+                "기술하는 해석이 양자이론의 불완전성을 드러낸다고 보네."
+            ),
+            "bohr": (
+                f"'{request.message}'에 대해서는 관측 가능한 결과와 관측 이전의 추측을 "
+                "구분해야 합니다. 관측 전 상태를 고전적인 생존이나 사망으로 단정하기보다, "
+                "관측을 통해 얻은 결과만 물리적으로 명확히 말할 수 있습니다."
+            )
         }
 
 @app.get("/", response_class=HTMLResponse)
