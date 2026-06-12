@@ -1,19 +1,84 @@
 # 슈뢰딩거 고양이 사고실험 시뮬레이션
 
-## 프로젝트 목적
-양자역학의 슈뢰딩거 고양이 사고실험을 학생들이 체험형으로 학습할 수 있도록 제작한 웹 시뮬레이션
+## 프로젝트 소개
 
-## 주요 기능
-- 사고실험 단계별 체험
-- 상자 관측
-- 보어-슈뢰딩거 토론
-- 학습 기록 저장
-- 투표 및 성찰 질문
+양자역학의 대표적인 사고실험인 슈뢰딩거의 고양이를 학생들이 직접 체험하고 토론할 수 있도록 제작한 웹 기반 시뮬레이션입니다.
 
-## 개발 과정
-- Gemini CLI 활용
-- ChatGPT Codex 활용
-- Render 배포
+### 주요 기능
+
+* 사고실험 단계별 체험
+* 상자 관측 및 결과 확인
+* 닐스 보어 vs 에르빈 슈뢰딩거 토론
+* 투표 및 성찰 질문
+* 학습 데이터 다운로드
+
+---
+
+## 사용 기술
+
+* FastAPI
+* HTML / CSS / JavaScript
+* Gemini API
+* Render
+
+---
+
+## 로컬 실행
+
+### 패키지 설치
+
+```bash
+pip install -r requirements.txt
+```
+
+### 환경변수 설정
+
+`.env` 파일 생성
+
+```env
+GEMINI_API_KEY=본인의_API_KEY
+```
+
+### 서버 실행
+
+```bash
+uvicorn app:app --reload
+```
+
+접속
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## Render 배포
+
+### Build Command
+
+```bash
+pip install -r requirements.txt
+```
+
+### Start Command
+
+```bash
+uvicorn app:app --host 0.0.0.0 --port $PORT
+```
+
+### Environment Variable
+
+```env
+GEMINI_API_KEY=본인의_API_KEY
+```
+
+---
+
+## GitHub 저장소
+
+https://github.com/tngus2914-alt/schrodinger_debate
 
 ## 배포 주소
+
 https://schrodinger-debate.onrender.com
