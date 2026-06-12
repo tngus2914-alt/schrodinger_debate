@@ -208,16 +208,11 @@
             position: relative;
             width: 100%;
             height: 360px;
-            background:
-                radial-gradient(circle at 22% 22%, rgba(254, 240, 138, 0.12), transparent 28%),
-                linear-gradient(180deg, rgba(186, 230, 253, 0.2), rgba(14, 116, 144, 0.06) 60%),
-                linear-gradient(135deg, #17253a, #0f1b2d);
-            backdrop-filter: blur(4px);
-            border: 3px solid rgba(148, 163, 184, 0.34);
+            background: #d8c7b5 url('/static/images/schrodinger-experiment-scene.png') center / cover no-repeat;
+            border: 2px solid rgba(226, 232, 240, 0.48);
             border-radius: 16px;
             overflow: hidden;
             box-shadow:
-                inset 0 0 40px rgba(0, 0, 0, 0.65),
                 inset 0 1px 0 rgba(255, 255, 255, 0.18),
                 0 8px 32px rgba(0, 0, 0, 0.37);
             transition: var(--transition);
@@ -238,136 +233,79 @@
             box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.15), 0 0 25px rgba(0, 240, 255, 0.2);
         }
 
+        .box-container.dead-scene {
+            background-image: url('/static/images/schrodinger-experiment-scene-die.png');
+            background-position: center;
+            background-size: cover;
+        }
+
+        .box-container.dead-scene .result-overlay {
+            background: rgba(2, 6, 23, 0.42);
+        }
+
         .box-interior {
             position: relative;
             width: 100%;
             height: 100%;
-            background:
-                linear-gradient(180deg, transparent 69%, rgba(100, 116, 139, 0.3) 69%, rgba(30, 41, 59, 0.82) 100%),
-                repeating-linear-gradient(90deg, transparent 0 49px, rgba(186, 230, 253, 0.035) 50px);
+            background: transparent;
         }
 
         .box-interior::before {
-            content: '';
-            position: absolute;
-            left: 5%;
-            right: 5%;
-            bottom: 30%;
-            height: 4px;
-            background: linear-gradient(90deg, rgba(71, 85, 105, 0.15), rgba(203, 213, 225, 0.5), rgba(71, 85, 105, 0.15));
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+            content: none;
         }
 
-        .chamber-window {
-            position: absolute;
-            left: 6%;
-            top: 7%;
-            width: 28%;
-            height: 22%;
-            border: 2px solid rgba(186, 230, 253, 0.24);
-            border-radius: 14px;
-            background:
-                radial-gradient(circle at 28% 35%, rgba(254, 240, 138, 0.5) 0 4px, transparent 5px),
-                linear-gradient(160deg, rgba(125, 211, 252, 0.18), rgba(255, 255, 255, 0.03));
-            box-shadow: inset 0 0 18px rgba(125, 211, 252, 0.08);
-            pointer-events: none;
-        }
-
+        .chamber-window,
         .experiment-bench {
-            position: absolute;
-            right: 5%;
-            bottom: 25%;
-            width: 53%;
-            height: 13px;
-            border-radius: 4px;
-            background: linear-gradient(180deg, #64748b, #334155);
-            box-shadow: 0 7px 0 #1e293b, 0 12px 18px rgba(0, 0, 0, 0.32);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .experiment-bench::before,
-        .experiment-bench::after {
-            content: '';
-            position: absolute;
-            top: 13px;
-            width: 8px;
-            height: 55px;
-            background: #334155;
-        }
-
-        .experiment-bench::before {
-            left: 12%;
-        }
-
-        .experiment-bench::after {
-            right: 12%;
+            display: none;
         }
 
         /* Interactive Items inside box */
         .sim-item {
             position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: block;
             cursor: pointer;
             transition: var(--transition);
-            z-index: 2;
+            z-index: 5;
+            border-radius: 18px;
         }
 
         .sim-item:hover {
-            transform: translateY(-2px);
-            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.45));
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: inset 0 0 0 2px rgba(0, 240, 255, 0.38);
         }
 
-        .sim-item svg {
-            width: 82px;
-            height: 82px;
-            transition: var(--transition);
-            filter: drop-shadow(0 7px 8px rgba(0, 0, 0, 0.4));
-        }
-
+        .sim-item svg,
         .sim-item span.label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            margin-top: 3px;
-            padding: 3px 7px;
-            border-radius: 999px;
-            background: rgba(8, 12, 20, 0.68);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
         }
 
         #item-atom {
-            right: 39%;
-            top: 28%;
+            left: 39%;
+            top: 35%;
+            width: 15%;
+            height: 48%;
         }
 
         #item-detector {
-            right: 21%;
-            top: 25%;
+            left: 55%;
+            top: 43%;
+            width: 17%;
+            height: 39%;
         }
 
         #item-poison {
-            right: 5%;
-            top: 29%;
+            left: 73%;
+            top: 35%;
+            width: 19%;
+            height: 48%;
         }
 
         #item-cat {
-            left: 8%;
-            bottom: 14%;
-            flex-direction: column;
-        }
-
-        #item-cat svg {
-            width: 165px;
-            height: 165px;
-        }
-
-        #item-cat .label {
-            font-size: 0.76rem;
+            left: 7%;
+            top: 30%;
+            width: 31%;
+            height: 55%;
         }
 
         /* SVG Animations */
@@ -409,51 +347,9 @@
         }
 
         /* Box Connection Wires */
-        .conn-wire {
-            position: absolute;
-            height: 1px;
-            background: rgba(148, 163, 184, 0.42);
-            z-index: 1;
-            pointer-events: none;
-            transition: var(--transition);
-        }
-
-        .conn-wire.w0 {
-            top: 42%;
-            left: 56%;
-            width: 10%;
-        }
-
-        .conn-wire.w1 {
-            top: 42%;
-            left: 73%;
-            width: 9%;
-        }
-
-        .conn-wire.w2 {
-            top: 55%;
-            left: 84%;
-            width: 16%;
-            transform: rotate(150deg);
-            transform-origin: left center;
-        }
-
-        .conn-wire.active {
-            background: var(--primary);
-            box-shadow: 0 0 6px var(--primary);
-        }
-
+        .conn-wire,
         .causal-caption {
-            position: absolute;
-            left: 50%;
-            bottom: 8px;
-            transform: translateX(-50%);
-            z-index: 3;
-            color: var(--text-muted);
-            font-size: 0.66rem;
-            letter-spacing: 0.02em;
-            white-space: nowrap;
-            pointer-events: none;
+            display: none;
         }
 
         /* Box Lid Overlay */
@@ -1479,77 +1375,31 @@
             }
 
             .box-interior {
-                background:
-                    linear-gradient(180deg, transparent 69%, rgba(100, 116, 139, 0.3) 69%, rgba(30, 41, 59, 0.82) 100%),
-                    repeating-linear-gradient(90deg, transparent 0 39px, rgba(186, 230, 253, 0.035) 40px);
-            }
-
-            .sim-item svg {
-                width: 66px;
-                height: 66px;
-            }
-
-            .sim-item span.label {
-                font-size: 0.6rem;
-                text-align: center;
+                background: transparent;
             }
 
             #item-atom {
-                right: 38%;
-                left: auto;
-                top: 30%;
+                left: 39%;
+                right: auto;
+                top: 35%;
             }
 
             #item-detector {
-                right: 19%;
-                left: auto;
-                top: 27%;
+                left: 55%;
+                right: auto;
+                top: 43%;
             }
 
             #item-poison {
-                right: 2%;
-                left: auto;
-                top: 31%;
+                left: 73%;
+                right: auto;
+                top: 35%;
             }
 
             #item-cat {
-                left: 3%;
+                left: 7%;
                 right: auto;
-                bottom: 15%;
-            }
-
-            #item-cat svg {
-                width: 130px;
-                height: 130px;
-            }
-
-            .conn-wire.w0 {
-                top: 43%;
-                left: 55%;
-                width: 10%;
-            }
-
-            .conn-wire.w1 {
-                top: 43%;
-                left: 73%;
-                width: 11%;
-            }
-
-            .conn-wire.w2 {
-                top: 56%;
-                left: 85%;
-                width: 17%;
-            }
-
-            .chamber-window {
-                left: 5%;
-                width: 27%;
-                height: 19%;
-            }
-
-            .experiment-bench {
-                right: 3%;
-                width: 55%;
+                top: 30%;
             }
 
             .header-title h1 {
@@ -2303,6 +2153,7 @@
         // 50% outcome
         const isAlive = Math.random() > 0.5;
         observedResult = isAlive ? '생존' : '사망';
+        const boxChamber = document.getElementById('box-chamber');
 
         // Apply physical layout changes in box representation
         const needle = document.getElementById('detector-needle');
@@ -2318,6 +2169,8 @@
         const wire2 = document.getElementById('wire-poison-cat');
 
         if (isAlive) {
+            boxChamber.classList.remove('dead-scene');
+
             // Atom stayed stable, no detector spike, vial intact, cat happy
             needle.setAttribute('x2', '35'); // stable needle position
             led.setAttribute('fill', '#22c55e'); // stable green light
@@ -2333,6 +2186,8 @@
             document.getElementById('box-result-title').innerText = "결과: 생존 (Alive)";
             document.getElementById('box-result-desc').innerText = "상자를 관측하는 시점에 원자가 붕괴하지 않아 독극물이 안전하게 방출되지 않았으며 고양이는 살아있는 상태로 결정되었습니다.";
         } else {
+            boxChamber.classList.add('dead-scene');
+
             // Atom decayed, detector spikes, hammer falls, vial breaks, cat ghostly
             needle.setAttribute('x2', '65'); // spikes right
             led.setAttribute('fill', '#ef4444'); // red alarm
