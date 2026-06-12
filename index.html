@@ -181,7 +181,7 @@
         /* 3D-Like Quantum Box Card */
         .box-card {
             width: 100%;
-            max-width: 480px;
+            max-width: 540px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -207,14 +207,30 @@
         .box-container {
             position: relative;
             width: 100%;
-            height: 320px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(9, 13, 22, 0.8) 100%);
+            height: 360px;
+            background:
+                radial-gradient(circle at 22% 22%, rgba(254, 240, 138, 0.12), transparent 28%),
+                linear-gradient(180deg, rgba(186, 230, 253, 0.2), rgba(14, 116, 144, 0.06) 60%),
+                linear-gradient(135deg, #17253a, #0f1b2d);
             backdrop-filter: blur(4px);
-            border: 2px solid rgba(255, 255, 255, 0.08);
+            border: 3px solid rgba(148, 163, 184, 0.34);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow:
+                inset 0 0 40px rgba(0, 0, 0, 0.65),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 8px 32px rgba(0, 0, 0, 0.37);
             transition: var(--transition);
+        }
+
+        .box-container::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 1px solid rgba(186, 230, 253, 0.16);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 4;
         }
 
         .box-container.superposition-active {
@@ -226,46 +242,132 @@
             position: relative;
             width: 100%;
             height: 100%;
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 15px;
+            background:
+                linear-gradient(180deg, transparent 69%, rgba(100, 116, 139, 0.3) 69%, rgba(30, 41, 59, 0.82) 100%),
+                repeating-linear-gradient(90deg, transparent 0 49px, rgba(186, 230, 253, 0.035) 50px);
+        }
+
+        .box-interior::before {
+            content: '';
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            bottom: 30%;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(71, 85, 105, 0.15), rgba(203, 213, 225, 0.5), rgba(71, 85, 105, 0.15));
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        .chamber-window {
+            position: absolute;
+            left: 6%;
+            top: 7%;
+            width: 28%;
+            height: 22%;
+            border: 2px solid rgba(186, 230, 253, 0.24);
+            border-radius: 14px;
+            background:
+                radial-gradient(circle at 28% 35%, rgba(254, 240, 138, 0.5) 0 4px, transparent 5px),
+                linear-gradient(160deg, rgba(125, 211, 252, 0.18), rgba(255, 255, 255, 0.03));
+            box-shadow: inset 0 0 18px rgba(125, 211, 252, 0.08);
+            pointer-events: none;
+        }
+
+        .experiment-bench {
+            position: absolute;
+            right: 5%;
+            bottom: 25%;
+            width: 53%;
+            height: 13px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #64748b, #334155);
+            box-shadow: 0 7px 0 #1e293b, 0 12px 18px rgba(0, 0, 0, 0.32);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .experiment-bench::before,
+        .experiment-bench::after {
+            content: '';
+            position: absolute;
+            top: 13px;
+            width: 8px;
+            height: 55px;
+            background: #334155;
+        }
+
+        .experiment-bench::before {
+            left: 12%;
+        }
+
+        .experiment-bench::after {
+            right: 12%;
         }
 
         /* Interactive Items inside box */
         .sim-item {
-            background: rgba(30, 41, 59, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
+            position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
-            position: relative;
-            padding: 8px;
+            z-index: 2;
         }
 
         .sim-item:hover {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
             transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.45));
         }
 
         .sim-item svg {
-            width: 70px;
-            height: 70px;
+            width: 82px;
+            height: 82px;
             transition: var(--transition);
+            filter: drop-shadow(0 7px 8px rgba(0, 0, 0, 0.4));
         }
 
         .sim-item span.label {
-            font-size: 11px;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-dim);
-            margin-top: 6px;
+            margin-top: 3px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(8, 12, 20, 0.68);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            white-space: nowrap;
+        }
+
+        #item-atom {
+            right: 39%;
+            top: 28%;
+        }
+
+        #item-detector {
+            right: 21%;
+            top: 25%;
+        }
+
+        #item-poison {
+            right: 5%;
+            top: 29%;
+        }
+
+        #item-cat {
+            left: 8%;
+            bottom: 14%;
+            flex-direction: column;
+        }
+
+        #item-cat svg {
+            width: 165px;
+            height: 165px;
+        }
+
+        #item-cat .label {
+            font-size: 0.76rem;
         }
 
         /* SVG Animations */
@@ -309,20 +411,49 @@
         /* Box Connection Wires */
         .conn-wire {
             position: absolute;
-            background: rgba(148, 163, 184, 0.2);
+            height: 1px;
+            background: rgba(148, 163, 184, 0.42);
             z-index: 1;
             pointer-events: none;
             transition: var(--transition);
         }
+
+        .conn-wire.w0 {
+            top: 42%;
+            left: 56%;
+            width: 10%;
+        }
+
         .conn-wire.w1 {
-            top: 25%; left: 75%; width: 2px; height: 50%;
+            top: 42%;
+            left: 73%;
+            width: 9%;
         }
+
         .conn-wire.w2 {
-            top: 75%; left: 25%; width: 50%; height: 2px;
+            top: 55%;
+            left: 84%;
+            width: 16%;
+            transform: rotate(150deg);
+            transform-origin: left center;
         }
+
         .conn-wire.active {
             background: var(--primary);
             box-shadow: 0 0 6px var(--primary);
+        }
+
+        .causal-caption {
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: var(--text-muted);
+            font-size: 0.66rem;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            pointer-events: none;
         }
 
         /* Box Lid Overlay */
@@ -1339,6 +1470,88 @@
         }
 
         @media (max-width: 600px) {
+            .box-card {
+                padding: 14px;
+            }
+
+            .box-container {
+                height: 330px;
+            }
+
+            .box-interior {
+                background:
+                    linear-gradient(180deg, transparent 69%, rgba(100, 116, 139, 0.3) 69%, rgba(30, 41, 59, 0.82) 100%),
+                    repeating-linear-gradient(90deg, transparent 0 39px, rgba(186, 230, 253, 0.035) 40px);
+            }
+
+            .sim-item svg {
+                width: 66px;
+                height: 66px;
+            }
+
+            .sim-item span.label {
+                font-size: 0.6rem;
+                text-align: center;
+            }
+
+            #item-atom {
+                right: 38%;
+                left: auto;
+                top: 30%;
+            }
+
+            #item-detector {
+                right: 19%;
+                left: auto;
+                top: 27%;
+            }
+
+            #item-poison {
+                right: 2%;
+                left: auto;
+                top: 31%;
+            }
+
+            #item-cat {
+                left: 3%;
+                right: auto;
+                bottom: 15%;
+            }
+
+            #item-cat svg {
+                width: 130px;
+                height: 130px;
+            }
+
+            .conn-wire.w0 {
+                top: 43%;
+                left: 55%;
+                width: 10%;
+            }
+
+            .conn-wire.w1 {
+                top: 43%;
+                left: 73%;
+                width: 11%;
+            }
+
+            .conn-wire.w2 {
+                top: 56%;
+                left: 85%;
+                width: 17%;
+            }
+
+            .chamber-window {
+                left: 5%;
+                width: 27%;
+                height: 19%;
+            }
+
+            .experiment-bench {
+                right: 3%;
+                width: 55%;
+            }
+
             .header-title h1 {
                 font-size: 1.3rem;
             }
@@ -1441,13 +1654,21 @@
             <div class="box-container" id="box-chamber">
                 <!-- Inner items -->
                 <div class="box-interior">
+                    <div class="chamber-window"></div>
+                    <div class="experiment-bench"></div>
+
                     <!-- Connections -->
+                    <div class="conn-wire w0" id="wire-atom-detector"></div>
                     <div class="conn-wire w1" id="wire-detector-poison"></div>
                     <div class="conn-wire w2" id="wire-poison-cat"></div>
 
                     <!-- 1. Radioactive Atom -->
                     <div class="sim-item" id="item-atom" onclick="showTooltip('atom', event)">
                         <svg viewBox="0 0 100 100">
+                            <rect x="24" y="66" width="52" height="20" rx="6" fill="#334155" stroke="#64748b" stroke-width="2"/>
+                            <rect x="33" y="72" width="34" height="7" rx="2" fill="#0f172a"/>
+                            <circle cx="39" cy="75.5" r="2" fill="#22c55e"/>
+                            <circle cx="47" cy="75.5" r="2" fill="#f59e0b"/>
                             <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(30 50 50)"/>
                             <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(150 50 50)"/>
                             <ellipse cx="50" cy="50" rx="35" ry="12" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(90 50 50)"/>
@@ -1488,7 +1709,7 @@
                             <rect x="46" y="36" width="8" height="6" rx="1" fill="#b45309"/>
                             <path d="M34,68 Q50,71 66,68 L64,76 A 2,2 0 0,1 62,78 L38,78 A 2,2 0 0,1 36,76 Z" fill="#22c55e" opacity="0.85" id="vial-liquid"/>
                         </svg>
-                        <span class="label">독극물 장치</span>
+                        <span class="label">밀봉 독극물 장치</span>
                     </div>
 
                     <!-- 4. Cat -->
@@ -1514,8 +1735,10 @@
                                 <ellipse cx="50" cy="20" rx="14" ry="4" fill="none" stroke="#ffd700" stroke-width="2" filter="drop-shadow(0 0 4px #ffd700)"/>
                             </g>
                         </svg>
-                        <span class="label" id="cat-label">고양이</span>
+                        <span class="label" id="cat-label">살아 있는 고양이</span>
                     </div>
+
+                    <div class="causal-caption">원자 붕괴 감지 → 검출기 신호 → 독극물 장치 → 고양이 상태</div>
                 </div>
 
                 <!-- Box Lid (Sealer) -->
@@ -1707,9 +1930,6 @@
                             <span class="chat-badge" id="chat-model-info">Gemini-2.0-Flash Active</span>
                         </div>
                         <div class="chat-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="btn btn-secondary" onclick="downloadChatLog()" style="font-size: 0.82rem; padding: 7px 12px;">
-                                📥 기록 다운로드
-                            </button>
                             <button class="btn btn-secondary" onclick="confirmClearChatLog()" style="font-size: 0.82rem; padding: 7px 12px; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);">
                                 🗑️ 기록 초기화
                             </button>
@@ -2093,6 +2313,7 @@
         const catVisual = document.getElementById('cat-visual');
         const catHalo = document.getElementById('cat-halo');
         const catLabel = document.getElementById('cat-label');
+        const wire0 = document.getElementById('wire-atom-detector');
         const wire1 = document.getElementById('wire-detector-poison');
         const wire2 = document.getElementById('wire-poison-cat');
 
@@ -2117,6 +2338,7 @@
             led.setAttribute('fill', '#ef4444'); // red alarm
             
             // Wire currents active
+            wire0.classList.add('active');
             wire1.classList.add('active');
             wire2.classList.add('active');
 
@@ -2715,6 +2937,7 @@
         const catVisual = document.getElementById('cat-visual');
         const catHalo = document.getElementById('cat-halo');
         const catLabel = document.getElementById('cat-label');
+        const wire0 = document.getElementById('wire-atom-detector');
         const wire1 = document.getElementById('wire-detector-poison');
         const wire2 = document.getElementById('wire-poison-cat');
 
@@ -2728,8 +2951,9 @@
         catHalo.style.display = "none";
         document.getElementById('cat-eye-l').setAttribute('r', '2.5');
         document.getElementById('cat-eye-r').setAttribute('r', '2.5');
-        catLabel.innerText = "고양이";
+        catLabel.innerText = "살아 있는 고양이";
 
+        wire0.className = 'conn-wire w0';
         wire1.className = 'conn-wire w1';
         wire2.className = 'conn-wire w2';
 
