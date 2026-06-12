@@ -1607,7 +1607,7 @@
                             😺
                         </div>
                         <h2 class="result-title" id="box-result-title">생존 확인</h2>
-                        <p class="result-desc" id="box-result-desc">관측이 수행되는 즉시 중첩 상태가 붕괴하여 단 하나의 실제적 생존 상태가 나타났습니다.</p>
+                        <p class="result-desc" id="box-result-desc">상자를 열어 확인한 관측 결과가 여기에 표시됩니다.</p>
                     </div>
                 </div>
             </div>
@@ -2184,7 +2184,7 @@
             document.getElementById('box-result-icon').innerText = "😺";
             document.getElementById('box-result-icon').className = "result-icon alive";
             document.getElementById('box-result-title').innerText = "결과: 생존 (Alive)";
-            document.getElementById('box-result-desc').innerText = "상자를 관측하는 시점에 원자가 붕괴하지 않아 독극물이 안전하게 방출되지 않았으며 고양이는 살아있는 상태로 결정되었습니다.";
+            document.getElementById('box-result-desc').innerText = "상자를 열어 관측한 결과, 방사성 원자가 붕괴하지 않은 것으로 확인되었습니다. 따라서 검출기와 독극물 장치가 작동하지 않았으며, 고양이는 살아 있는 상태로 관측되었습니다.";
         } else {
             boxChamber.classList.add('dead-scene');
 
@@ -2213,7 +2213,7 @@
             document.getElementById('box-result-icon').innerText = "👻";
             document.getElementById('box-result-icon').className = "result-icon dead";
             document.getElementById('box-result-title').innerText = "결과: 사망 (Decayed)";
-            document.getElementById('box-result-desc').innerText = "상자를 관측하는 시점에 원자가 붕괴하여 검출기와 독가스를 작동시켰으며, 고양이는 조용히 사망한 상태로 결정되었습니다.";
+            document.getElementById('box-result-desc').innerText = "상자를 열어 관측한 결과, 방사성 원자가 붕괴한 것으로 확인되었습니다. 검출기가 이를 감지하여 독극물 장치가 작동하였고, 고양이는 죽은 상태로 관측되었습니다.";
         }
 
         // Open Lid
@@ -2227,7 +2227,7 @@
             document.getElementById('box-result-overlay').classList.add('active');
             document.getElementById('val-obs-result').innerText = observedResult;
             document.getElementById('post-observation-section').style.display = 'block';
-            document.getElementById('sim-status-desc').innerText = `관측이 종결되어 고양이는 '${observedResult}' 상태로 붕괴되었습니다.`;
+            document.getElementById('sim-status-desc').innerText = "";
         }, 800);
     }
 
