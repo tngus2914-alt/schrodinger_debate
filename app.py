@@ -16,12 +16,15 @@ BASE_DIR = Path(__file__).parent
 env_path = BASE_DIR / ".env"
 load_dotenv(dotenv_path=str(env_path))
 
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash").strip()
+
 # API 키 존재 여부 확인 (두 환경변수 이름 모두 지원)
 api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
 if api_key:
     print(f"DEBUG: Gemini API key is found (length: {len(api_key)})")
 else:
     print("WARNING: GOOGLE_API_KEY or GEMINI_API_KEY is missing. Local fallback responses will be used.")
+print(f"INFO: Gemini model configured: {GEMINI_MODEL}")
 
 app = FastAPI()
 
@@ -63,15 +66,6 @@ DEBATE_SYSTEM_PROMPT = """당신은 양자역학의 역사적 대립을 중재�
   * "양자역학의 수학적 기술에서는 생존 상태와 사망 상태가 함께 포함된 중첩 상태로 표현된다"
   * "저는 이러한 해석이 거시 세계에서는 역설적으로 보인다고 지적하였습니다."
 """
-
-# 가용한 최신 모델 리스트 정의 (Rate limit/429 회피용 자동 폴백 순서)
-MODELS_TO_TRY = [
-    "gemini-3.5-flash", 
-    "gemini-2.5-flash", 
-    "gemini-flash-latest",  # gemini-1.5-flash에 대응
-    "gemini-2.0-flash", 
-    "gemini-2.0-flash-lite"
-]
 
 class DebateRequest(BaseModel):
     message: str
@@ -136,30 +130,22 @@ def parse_json_response(content) -> dict:
     cleaned = cleaned.strip()
     return json.loads(cleaned)
 
-async def invoke_gemini_with_fallback(messages: list) -> tuple:
-    """정의된 모델 목록을 순서대로 테스트하여 응답에 성공하는 모델의 결과를 반환합니다."""
+async def invoke_gemini(messages: list) -> tuple:
+    """설정된 단일 Gemini 모델을 호출합니다."""
     if not api_key:
         raise RuntimeError("Gemini API key is not configured")
 
-    last_error = None
-    for model_name in MODELS_TO_TRY:
-        try:
-            print(f"호출 시도 중인 모델: {model_name}...")
-            llm = ChatGoogleGenerativeAI(
-                model=model_name, 
-                temperature=0.7, 
-                google_api_key=api_key,
-                response_mime_type="application/json",
-                max_retries=0
-            )
-            res = await llm.ainvoke(messages)
-            print(f"성공 모델: {model_name}")
-            return res, model_name
-        except Exception as e:
-            print(f"모델 {model_name} 호출 실패: {e}")
-            last_error = e
-            continue
-    raise last_error
+    print(f"INFO: Invoking Gemini model: {GEMINI_MODEL}")
+    llm = ChatGoogleGenerativeAI(
+        model=GEMINI_MODEL,
+        temperature=0.7,
+        google_api_key=api_key,
+        response_mime_type="application/json",
+        max_retries=0
+    )
+    res = await llm.ainvoke(messages)
+    print(f"INFO: Gemini response received from: {GEMINI_MODEL}")
+    return res, GEMINI_MODEL
 
 @app.post("/init_debate")
 async def init_debate(request: InitDebateRequest):
@@ -179,7 +165,7 @@ async def init_debate(request: InitDebateRequest):
             HumanMessage("안녕하세요 박사님들, 토론을 시작해 주세요.")
         ]
         
-        res, working_model = await invoke_gemini_with_fallback(messages)
+        res, working_model = await invoke_gemini(messages)
         data = parse_json_response(res.content)
         
         sch_reply = sanitize_response(data.get("schrodinger", ""))
@@ -224,7 +210,7 @@ async def debate(request: DebateRequest):
                 
         messages.append(HumanMessage(request.message))
         
-        res, working_model = await invoke_gemini_with_fallback(messages)
+        res, working_model = await invoke_gemini(messages)
         data = parse_json_response(res.content)
         
         sch_reply = sanitize_response(data.get("schrodinger", ""))

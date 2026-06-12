@@ -82,3 +82,16 @@ https://github.com/tngus2914-alt/schrodinger_debate
 ## 배포 주소
 
 https://schrodinger-debate.onrender.com
+
+## Gemini 모델 설정
+
+기본 모델은 `gemini-3.5-flash`입니다.
+
+로컬 `.env`와 Render의 Environment 설정에 다음 값을 사용하세요.
+
+```env
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+서버 시작 로그의 `INFO: Gemini model configured`와 API 호출 로그의
+`INFO: Invoking Gemini model`에서 실제 사용 모델을 확인할 수 있습니다.
