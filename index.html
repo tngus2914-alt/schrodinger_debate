@@ -254,6 +254,90 @@
             content: none;
         }
 
+        .scene-animation {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .cat-tail-scene {
+            background: url('/static/images/schrodinger-experiment-scene.png') center / cover no-repeat;
+            clip-path: polygon(5% 54%, 19% 51%, 24% 64%, 23% 73%, 15% 81%, 5% 79%);
+            transform-origin: 21% 68%;
+            animation: scene-tail-wag 2.4s ease-in-out infinite;
+        }
+
+        @keyframes scene-tail-wag {
+            0%, 100% { transform: rotate(-0.7deg); }
+            50% { transform: rotate(1.5deg); }
+        }
+
+        .atom-sparkle {
+            left: 41.5%;
+            top: 39%;
+            right: auto;
+            bottom: auto;
+            width: 9%;
+            height: 27%;
+            overflow: hidden;
+            border-radius: 45% 45% 16% 16%;
+        }
+
+        .atom-sparkle::before {
+            content: '';
+            position: absolute;
+            left: 39%;
+            top: 36%;
+            width: 22%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: rgba(249, 168, 255, 0.7);
+            box-shadow: 0 0 10px 6px rgba(232, 121, 249, 0.38);
+            animation: atom-glow-pulse 1.35s ease-in-out infinite alternate;
+        }
+
+        .atom-sparkle span {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fff5ff;
+            box-shadow: 0 0 8px 3px #e879f9;
+            animation: atom-particle-twinkle 1.6s ease-in-out infinite;
+        }
+
+        .atom-sparkle span:nth-child(1) {
+            left: 25%;
+            top: 27%;
+        }
+
+        .atom-sparkle span:nth-child(2) {
+            right: 20%;
+            top: 43%;
+            animation-delay: -0.55s;
+        }
+
+        .atom-sparkle span:nth-child(3) {
+            left: 42%;
+            bottom: 18%;
+            animation-delay: -1.05s;
+        }
+
+        @keyframes atom-glow-pulse {
+            from { opacity: 0.45; transform: scale(0.82); }
+            to { opacity: 1; transform: scale(1.12); }
+        }
+
+        @keyframes atom-particle-twinkle {
+            0%, 100% { opacity: 0.2; transform: translateY(4px) scale(0.65); }
+            45% { opacity: 1; transform: translateY(-5px) scale(1.15); }
+        }
+
+        .box-container.dead-scene .scene-animation {
+            display: none;
+        }
+
         .chamber-window,
         .experiment-bench {
             display: none;
@@ -1506,6 +1590,12 @@
                 <div class="box-interior">
                     <div class="chamber-window"></div>
                     <div class="experiment-bench"></div>
+                    <div class="scene-animation cat-tail-scene" aria-hidden="true"></div>
+                    <div class="scene-animation atom-sparkle" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
                     <!-- Connections -->
                     <div class="conn-wire w0" id="wire-atom-detector"></div>
